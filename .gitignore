@@ -1,2 +1,3 @@
-engine/config.php
 Thumbs.db
+bin/**
+make.bat

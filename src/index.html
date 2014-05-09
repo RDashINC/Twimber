@@ -10,31 +10,6 @@
 	<script src="engine/public/js/bootstrap.min.js" type="text/javascript"></script>
 	<script src="engine/public/js/window.js" type="text/javascript"></script>
 	<script src="engine/public/js/ajax.js" type="text/javascript"></script>
-	<script type="text/javascript">
-	function reload()
-	{
-		console.log("[index.html] reload: Attempting too reload.");
-		document.getElementById("tweet-ctr").innerHTML="<img style=\"display: block;margin-left:auto;margin-right:auto;\" src=\"engine/public/img/ajax-loader.gif\"></img>";
-		$.get("index.php", function(data) {
-			document.getElementById("tweet-ctr").innerHTML=data;
-		});
-	}
-	
-	function sendStatus() {
-		var message = document.getElementById("tweet-send").value;
-		console.log("[index.html] sendStatus: Sending Tweet with: '"+message+"'");
-		$.ajax({
-			type: "POST",
-			url: "doAction.php",
-			data: { "id": "null", "action": "send", "message": message},
-			success: function(data) {
-				console.log("[index.html] sendStatus: Server Response: "+data);
-				reload();
-				document.getElementById("tweet-send").value = "";
-			}
-		});
-	}
-	</script>
 </head>
 	<nav class="navbar navbar-inverse" role="navigation">
 		<div class="navbar-header">
@@ -58,9 +33,6 @@
 			</span>
 		</div>
 		<div id="tweet-ctr" class="tweet container">
-			<script type="text/javascript">
-				$(document).ready(reload());
-			</script>
 		</div>
 	</body>
 </html>

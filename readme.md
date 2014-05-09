@@ -15,7 +15,7 @@ Features
 Version
 ----
 
-1.0 Pre-Alpha
+1.0.1 Pre-Alpha
 
 Internals
 -----------
@@ -25,12 +25,41 @@ vTweet uses a number of open source projects to work properly:
 * [Twitter Bootstrap] - great UI boilerplate for modern web apps
 * [jQuery] - duh
 * [HTML5] - Because it's better than HTML4
-* [PHP] - For Easy "Server-side" implementation.
+* [node.js] - Only thing that would honestly work.
 * [Javascript] - this is an easy one.
+* [node-webkit] - Creating Simple node.js applications.
+
+Using Source
+-----------
+
+You'll need a version of [node-webkit](https://github.com/rogerwang/node-webkit) [Any OS]
+
+If you run windows, you can download this make utility: [make](http://www.mediafire.com/download/r49swq23xw3ow66/make.7z)
+
+Extract nw, and if using make, into the base directory.
+
+Manual
+---------
+
+Zip src/* (DO NOT INCLUDE SRC AS FOLDER, IT MUST BE BASE).
+
+Run `nw [zip].zip`
+
+
+Make
+--------
+
+Run `make launch`
+
+-- or --
+
+Run `make` too just package it.
+
+-- or --
+
+Run `make release` too create a standalone exe (reqs. DLLs)
 
 License
 ----
 
 GNUGPLv3
-
-    

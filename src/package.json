@@ -1,0 +1,15 @@
+{
+  "name": "vTweet",
+  "description": "A Twitter Client",
+  "version": "1.0.1",
+  "main": "index.html",
+  "window": {
+    "title": "vTweet",
+    "toolbar": true
+  },
+  "maintainers":[ {
+	 "name": "RainbowDashDCs",
+	 "email": "allardj64@gmail.com",
+	 "web": "http://www.about.me/jaredallard"
+	}]
+}
