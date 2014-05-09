@@ -4,12 +4,15 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	<script src="engine/public/js/jquery-2.1.1.min.js" type="text/javascript"></script>
 	<link rel="stylesheet" href="engine/public/css/bootstrap.css" type="text/css"></script>
+	<script src="engine/public/js/config.js" type="text/javascript"></script>
+	<script src="engine/public/js/jquery-2.1.1.min.js" type="text/javascript"></script>
+	<script src="engine/public/js/jquery.linkify.min.js" type="text/javascript"></script>
 	<script src="engine/public/js/functions.js" type="text/javascript"></script>
-	<script src="engine/public/js/bootstrap.min.js" type="text/javascript"></script>
+	<script src="engine/public/js/bootstrap.js" type="text/javascript"></script>
 	<script src="engine/public/js/window.js" type="text/javascript"></script>
 	<script src="engine/public/js/ajax.js" type="text/javascript"></script>
+	<script src="engine/public/js/twitter.js" type="text/javascript"></script>
 </head>
 	<nav class="navbar navbar-inverse" role="navigation">
 		<div class="navbar-header">
@@ -17,22 +20,22 @@
 		</div>
 	</nav>
 	<body>
-		<h1>Hello, World!</h1>
-		<br />
-		<div id='container'>
-		</div>
-		<br />
-		<br />
-			<button onclick="reload()" class="btn btn-default" type="button">Refresh</button>
-		</div>
-		<a href="index.php">Goto Index</a>
 		<div class="input-group" style='margin-bottom:5px;'>
 			<input id="tweet-send" type="text" class="form-control">
 			<span class="input-group-btn">
-				<button onclick="sendStatus()" class="btn btn-default" type="button">Send</button>
+				<button onclick="statusFunc()" class="btn btn-default" type="button">Send</button>
 			</span>
 		</div>
 		<div id="tweet-ctr" class="tweet container">
 		</div>
+		<script type="text/javascript">getUserStream();</script>
+		<script type="text/javascript">
+		function statusFunc() {
+			var status = document.getElementById("tweet-send").value;
+			postStatus(status);
+			document.getElementById("tweet-send").value="";
+		}
+		</script>
+		<script type="text/javascript">initStream();</script>
 	</body>
 </html>

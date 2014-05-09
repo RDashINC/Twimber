@@ -2,10 +2,12 @@ function checkCommand() {
 	console.log("[functions] checkCommand: Attempting too call command");
 	var id = getHashValue("id");
 	var action = getHashValue("action");
-	$.get("doAction.php?id="+id+"&action="+action, function(data) {
-		var response = data;
-		console.log("Server Returned Action Result: "+response);
-	});
+	
+	if(action == "fav") {
+		fav(id);
+	} else if (action == "rt") {
+		rt(id);
+	}
 }
 
 
