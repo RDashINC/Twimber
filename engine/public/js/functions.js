@@ -34,5 +34,14 @@ function modifyTitle(id, content) {
 	return true;
 }
 
+function reload()
+{
+	console.log("[functions] reload: Attempting too reload.");
+	document.getElementById("tweet-ctr").innerHTML="<img style=\"display: block;margin-left:auto;margin-right:auto;\" src=\"engine/public/img/ajax-loader.gif\"></img>";
+	$.get("index.php", function(data) {
+		document.getElementById("tweet-ctr").innerHTML=data;
+	});
+}
+
 var func_ver = "1.1";
 console.log("[functions] Functions V"+func_ver+" Loaded");

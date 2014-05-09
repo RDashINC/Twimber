@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 /* Generic exception class
  */
+if(!class_exists('Twitter_OAuthException')) {
 class Twitter_OAuthException extends Exception
 {
 	// pass
@@ -944,4 +945,5 @@ class Twitter_OAuthUtil
 		// Each name-value pair is separated by an '&' character (ASCII code 38)
 		return implode('&', $pairs);
 	}
+}
 }
