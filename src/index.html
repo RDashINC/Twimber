@@ -7,6 +7,7 @@
 	<link rel="stylesheet" href="engine/public/css/bootstrap.css" type="text/css"></script>
 	<script src="engine/public/js/config.js" type="text/javascript"></script>
 	<script src="engine/public/js/jquery-2.1.1.min.js" type="text/javascript"></script>
+	<script src="engine/public/js/jquery.hotkeys.js" type="text/javascript"></script>
 	<script src="engine/public/js/jquery.linkify.min.js" type="text/javascript"></script>
 	<script src="engine/public/js/functions.js" type="text/javascript"></script>
 	<script src="engine/public/js/bootstrap.js" type="text/javascript"></script>
@@ -14,14 +15,15 @@
 	<script src="engine/public/js/ajax.js" type="text/javascript"></script>
 	<script src="engine/public/js/jsOAuth-1.1.js" type="text/javascript"></script>
 	<script src="engine/public/js/twitter.js" type="text/javascript"></script>
-	<script type="text/javascript">document.onload=function() {
-		window.config=false;
-		$('#tweet-send').keypress(function(e) {
-			if(e.which == 13) {
-				statusFunc();
-			}
+	<script src="engine/public/js/screenshot.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			window.reply=false;
+			$("#tweet-send").bind('keydown', 'ctrl+return', function() {
+				tryToPost("tweet-send-button");
+			});
 		});
-	};</script>
+	</script>
 </head>
 	<nav class="navbar navbar-inverse" role="navigation">
 		<div class="navbar-header">
@@ -38,7 +40,7 @@
 		</div>
 	</nav>
 	<body>
-		<div id="tweet-ctr" class="tweet container" style="margin:0;bottom:0;height:100%;overflow:auto;">
+		<div id="tweet-ctr" class="tweet container" style="margin:0;bottom:0;height:100%;overflow:auto;max-width:500px">
 		</div>
 		
 		<!-- Footer -->

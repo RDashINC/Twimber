@@ -1,4 +1,5 @@
 function checkCommand() {
+	var scr = document.body.scrollTop;
 	console.log("[functions] checkCommand: Attempting too call command");
 	var id = getHashValue("id");
 	var action = getHashValue("action");
@@ -20,6 +21,8 @@ function checkCommand() {
 		console.log("[window] checkCommand: window.reply set too false, tweet-send cleared, hash reset.");
 		location.hash="#";
 	}
+	location.hash="";
+	document.body.scrollTop = scr;
 }
 
 
@@ -28,7 +31,7 @@ function getHashValue(key) {
 }
 
 function locationHashChanged(url) {
-	if(location.hash == "") {
+	if(location.hash === "") {
 		console.log("Hash: null, ignoring.");
 		return false;
 	} else {
@@ -40,3 +43,17 @@ function locationHashChanged(url) {
 window.onhashchange = function () {
 	locationHashChanged(location.hash);
 };
+
+function tryToPost(id) {
+	var tag_name = $(document.activeElement).prop("tagName");
+	console.log("[window] tryToPost: ctrl+return event fired on a '"+tag_name+"'");
+	if(tag_name == "INPUT") {
+		var func_to_exec = $("#"+id).attr("onclick");
+		console.log("[window] tryToPost: Trying too execute function '"+func_to_exec+"'");
+		eval(func_to_exec);
+		console.log("[window]: tryToPost: Attempt Made");
+	}
+}
+
+var window_ver = "1.4.2";
+console.log("[window]: Loaded Version "+window_ver);

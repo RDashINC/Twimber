@@ -10,11 +10,25 @@ function initStream() {
 	document.getElementById("tweet-ctr").innerHTML="<img style=\"display: block;margin-left:auto;margin-right:auto;\" src=\"engine/public/img/ajax-loader.gif\"></img>";
 	var Twit = require('twitter')
 	var T = new Twit(window.config)
+	
+	/** Check Creds **/
+	T.get('account/verify_credentials', function(err, data, response) {
+		console.log("[twitter] /initStream/ => [checkCreds]: Got a response from Twitter");
+		console.log(data);
+	});
+	
 	T.get('statuses/home_timeline', { count: "150" }, function (err, data, response) {
 		var tweets = data;
 		document.getElementById("tweet-ctr").innerHTML="";
+		var num = 0
 		tweets.forEach(function(tweet) {
-			createFormattedTweet(tweet, true);
+			var num = num + 1;
+			if(num = 1) {
+				createFormattedTweet(tweet, true, true);
+				document.getElementsByClassName('tweet')[1].id="first_tweet";
+			} else {
+				createFormattedTweet(tweet, true);
+			}
 		});
 		var data = "";
 		reload();
@@ -111,7 +125,7 @@ function processTweetLinks(text) {
     exp = /(^|\s)#(\w+)/g;
     text = text.replace(exp, "$1<a href='http://search.twitter.com/search?q=%23$2' target='_blank' class='tweet hashtag' id='$2'>#$2</a>");
     exp = /(^|\s)@(\w+)/g;
-    text = text.replace(exp, "$1<a href='http://www.twitter.com/$2' target='_blank'>@$2</a>");
+    text = text.replace(exp, "$1<a href='#id=null&action=lookup&un=$2'>@$2</a>");
     return text;
 }
 
@@ -123,7 +137,7 @@ function getDms() {
 	})
 }
 
-function createFormattedTweet(tweet, ap) {
+function createFormattedTweet(tweet, ap, first) {
 	var text = tweet.text;
 	var screenname = tweet.user.screen_name;
 	var name = tweet.user.name;
@@ -132,14 +146,36 @@ function createFormattedTweet(tweet, ap) {
 	var profile_image_url = tweet.user.profile_image_url;
 	var protect = tweet.user.protected;
 	var created= tweet.created_at;
+	var retweeted = tweet.retweeted;
+	var favorited = tweet.favorited;
+	if(typeof(tweet.retweeted_status)==='undefined') {
+		var retweeted_stat=false;
+	} else {
+		console.log("[twitter] createFormattedTweet: Got a Retweet, formatting values.");
+		var retweeted_stat=true;
+		screenname = tweet.retweeted_status.user.screen_name;
+		name = tweet.retweeted_status.user.name;
+		source = tweet.retweeted_status.source;
+		profile_image_url = tweet.retweeted_status.user.profile_image_url;
+		created = tweet.retweeted_status.created_at;
+		text.replace('RT @'+screenname+':', '');
+	}
 	
 	var final_text = "<div class='tweet'>";
 	var final_text = final_text+"	<img style='float:left;padding:0 1ex 1ex 0; margin-bottom:5px;' src='"+profile_image_url+"'>";
-	var final_text = final_text+"	<a class='tweet from_user' href='http://twitter.com/"+screenname+"'>"+name+" - @"+screenname+"</a>";
+	var final_text = final_text+"	<a class='tweet from_user' href='http://twitter.com/"+screenname+"'>["+name+"] @"+screenname+"</a>";
 	var final_text = final_text+processTweetLinks("	<p id='tweet-text' class='tweet contents'> "+text+" </p>");
 	var final_text = final_text+"	<span class='tweet timestamp'>"+created+"</span>";
-	var final_text = final_text+"	<a id='"+id+"-fav' class='tweet favourite' href='#id="+id+"&action=fav'>Favourite</a>&nbsp;";
-	var final_text = final_text+"	<a id='"+id+"-rt' class='tweet retweet' href='#id="+id+"&action=rt'>Retweet</a>&nbsp;";
+	if(favorited) {
+		var final_text = final_text+"	<a id='"+id+"-fav' class='tweet favourited' href='#'>Favourited</a>&nbsp;";
+	} else {
+		var final_text = final_text+"	<a id='"+id+"-fav' class='tweet favourite' href='#id="+id+"&action=fav'>Favourite</a>&nbsp;";
+	}
+	if(retweeted) {
+		var final_text = final_text+"	<a id='"+id+"-rt' class='tweet retweeted' href='#'>Retweeted</a>&nbsp;";
+	} else {
+		var final_text = final_text+"	<a id='"+id+"-rt' class='tweet retweet' href='#id="+id+"&action=rt'>Retweet</a>&nbsp;";
+	}
 	var final_text = final_text+"	<a id='"+id+"-reply' class='tweet reply' href='#id="+id+"&action=reply&un="+screenname+"'>Reply</a>&nbsp;|&nbsp;";
 	var final_text = final_text+"	<a class='tweet src'>"+source+"</a>";
 	var final_text = final_text+"</div>";
@@ -149,7 +185,20 @@ function createFormattedTweet(tweet, ap) {
 			$( "#tweet-ctr" ).append(final_text);
 		}
 	} else {
-		$( "#tweet-ctr" ).prepend(final_text);
+		if(first === true) {
+			console.log("[twitter] createFormattedTweet: Got a first tweet");
+			$('#tweet-ctr').prepend(final_text);
+		} else {
+			scroll =$(document).scrollTop();
+			
+			if(scroll > 1) {
+				var firstMsg = $('#first_tweet');
+				$('#tweet-ctr').prepend(final_text);
+				$(document).scrollTop(firstMsg.offset().top);
+			} else {
+				$('#tweet-ctr').prepend(final_text);
+			}
+		}
 	}
 	$("#tweet-text").linkify();
 	
@@ -171,18 +220,27 @@ function fav(id) {
 		console.log(err)
 	})
 	document.getElementById(id+"-fav").value="";
-	document.getElementById(id+"-fav").innerHTML="<span class='tweet favourited'>Favourited</span>";
+	document.getElementById(id+"-fav").innerHTML="<span class='tweet favourited'>Favourited&nbsp;</span>";
 }
 
 function rt(id) {
 	console.log("[twitter] rt: Attempting too RT tweet with id of '"+id+"'");
 	var Twit = require('twitter');
 	var T = new Twit(window.config);
-	T.post('statuses/retweet', { id: id }, function (err, data, response) {
+	T.post('statuses/retweet/:id', { id: id }, function (err, data, response) {
 		console.log(err)
 	})
 	document.getElementById(id+"-rt").value="";
-	document.getElementById(id+"-rt").innerHTML="<span class='tweet retweeted'>Retweeted</span>";
+	document.getElementById(id+"-rt").innerHTML="<span class='tweet retweeted'>Retweeted&nbsp;</span>";
+}
+
+function del(id) {
+	console.log("[twitter] del: Attempting too del your tweet with an id of '"+id+"'");
+	var Twit = require('twitter');
+	var T = new Twit(window.config);
+	T.post('statuses/delete/:id', { id: id }, function (err, data, response) {
+		console.log(err)
+	})
 }
 
 var twit_ver="1.1-dev";

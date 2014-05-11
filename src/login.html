@@ -24,8 +24,12 @@
 	</script>
 	<script src="engine/public/js/config.js" type="text/javascript"></script>
 	<script src="engine/public/js/jquery-2.1.1.min.js" type="text/javascript"></script>
+	<script src="engine/public/js/jquery.hotkeys.js" type="text/javascript"></script>
 	<script src="engine/public/js/bootstrap.js" type="text/javascript"></script>
+	<script src="engine/public/js/jquery.linkify.min.js" type="text/javascript"></script>
+	<script src="engine/public/js/jquery.backstretch.js" type="text/javascript"></script>
 	<script src="engine/public/js/functions.js" type="text/javascript"></script>
+	<script src="engine/public/js/screenshot.js" type="text/javascript"></script>
 	<script src="engine/public/js/jsOAuth-1.1.js" type="text/javascript"></script>
 	<script src="engine/public/js/twitter.js" type="text/javascript"></script>
 	<script type="text/javascript">
@@ -34,15 +38,28 @@
 			if(hash !== "" ) {
 				if(hash == "#contact") {
 					document.getElementById("nav-menu").innerHTML="<li><a href='#'>Home</a></li><li><a href='#about'>About</a></li><li class='active'><a href='#contact'>Contact</a></li>";
-					document.getElementById("main-disp").innerHTML="<h1 class='cover-heading'>UC</h1>";
+					document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>UC</h1><p class='lead'>&nbsp;</p>";
 				} else if (hash == "#about") {
 					document.getElementById("nav-menu").innerHTML="<li><a href='#'>Home</a></li><li class='active'><a href='#about'>About</a></li><li><a href='#contact'>Contact</a></li>";
-					document.getElementById("main-disp").innerHTML="<h1 class='cover-heading'>UC</h1>";
+					document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>UC</h1><p class='lead'>&nbsp;</p>";
 				} else if(hash == "#users") {
-					document.getElementById("nav-menu").innerHTML="<li><a href='#'>Home</a></li><li><a href='#about'>About</a></li><li><a href='#contact'>Contact</a></li>";
-					document.getElementById("main-disp").innerHTML="<h1 class='cover-heading'>User</h1><p class=lead><button class='btn btn-default' type='button' focus onclick='window.location.replace(\"load-index.html\");'>Login as Main</button>";
+					var Twit = require('twitter');
+					var T = new Twit(window.config);
+					
+					/** Check Creds **/
+					T.get('account/verify_credentials', function(err, data, response) {
+						console.log("[twitter] /initStream/ => [checkCreds]: Got a response from Twitter");
+						console.log(data);
+						if (data.status.source == "web") {
+							var source="<a href='http://twitter.com/'>web</a>"
+						} else {
+							var source=data.status.source
+						}
+						document.getElementById("nav-menu").innerHTML="<li><a href='#'>Home</a></li><li><a href='#about'>About</a></li><li><a href='#contact'>Contact</a></li>";
+						document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'><img src='"+data.profile_image_url.replace('normal', 'bigger')+"' alt='"+data.screen_name+"'></h1><p class='lead'>["+data.name+"] - @"+data.screen_name+"</p><p id='status' class='lead'>\""+processTweetLinks(data.status.text)+"\"</p><p class='lead'>from "+source+"</p><p class='lead'><button class='btn btn-default' type='button' focus onclick='window.location.replace(\"load-index.html\");'>Login as @"+data.screen_name+"</button><p class='lead'>&nbsp;</p>";
+					});
 				} else {
-					document.getElementById("main-disp").innerHTML="<h1 class='cover-heading'>OAuth PIN</h1><p class='lead'><input  style='color:black;' id='pin' type='number' placeholder='PIN'></p><p class='lead'><button class='btn btn-default' id='pinbutton' type='button' onclick='auth();'>Submit</button></p>";
+					document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>OAuth PIN</h1><p class='lead'><input  style='color:black;' id='pin' type='number' placeholder='PIN'></p><p class='lead'><button class='btn btn-default' id='pinbutton' type='button' onclick='auth();'>Submit</button></p><p class='lead'>&nbsp;</p>";
 					$('#pin').keypress(function(e) {
 						if(e.which == 13) {
 							auth();
@@ -51,7 +68,7 @@
 				}
 			} else {
 				document.getElementById("nav-menu").innerHTML="<li class='active'><a href='#'>Home</a></li><li><a href='#about'>About</a></li><li><a href='#contact'>Contact</a></li>";
-				document.getElementById("main-disp").innerHTML="<h1 class='cover-heading'>Login</h1><p class='lead'><input style='color:black' type='text' id='login-username' placeholder='Username' required></p><p class='lead'><button id='login-button' onclick='doLogin();' class='btn btn-default' type='button' focus>Send</button></p>";
+				document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>Login</h1><p class='lead'><input style='color:black' type='text' id='login-username' placeholder='Username' required></p><p class='lead'><button id='login-button' onclick='doLogin();' class='btn btn-default' type='button' focus>Send</button></p><p class='lead'>&nbsp;</p>";
 				$('#login-username').keypress(function(e) {
 					if(e.which == 13) {
 						doLogin();
@@ -65,6 +82,15 @@
 		$(document).ready(function() { loadContent(location.hash); });
 		$(window).on('hashchange', function () {
 			loadContent(location.hash);
+		});
+		
+		$(document).ready(function() {
+			$("html").backstretch([
+				"engine/public/img/bg.jpg",
+				"engine/public/img/bg2.jpg",
+				"engine/public/img/bg3.jpg",
+				"engine/public/img/bg4.jpg"
+			], {duration: 7500, fade: 900});
 		});
 	</script>
   </head>
@@ -85,7 +111,8 @@
             </div>
           </div>
 
-          <div id='main-disp' class='inner cover'>
+          <div style="-webkit-border-top-left-radius: 15px;-webkit-border-bottom-left-radius: 15px; -webkit-border-top-right-radius: 15px;-webkit-border-bottom-right-radius: 15px;display:block; background: rgba(64, 64, 64, 0.8);" id='main-disp' class='inner cover'>
+			<img src='engine/public/img/page_load.gif'>
 		  </div>
 
           <div class="mastfoot">

@@ -1,7 +1,7 @@
 {
   "name": "vTweet",
   "description": "A Twitter Client",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "load.html",
   "window": {
     "title": "vTweet",
