@@ -32,7 +32,7 @@ function modifyTitle(id, content) {
 	return true;
 }
 
-function writeTooConfig(array, file) {
+function writeToConfig(array, file) {
 	console.log("[functions] writeTooConfig: Writing: '"+array+"' too config.");
 	var array = 'window.saved_config='+array;
 	var fs = require('fs');

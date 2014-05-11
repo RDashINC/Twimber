@@ -47,8 +47,8 @@
 					var T = new Twit(window.config);
 					
 					/** Check Creds **/
-					T.get('account/verify_credentials', function(err, data, response) {
-						console.log("[twitter] /initStream/ => [checkCreds]: Got a response from Twitter");
+					T.get('users/show', { screen_name: window.config.screen_name } , function(err, data, response) {
+						console.log("[twitter] /loadContent/ => [user/show]: Looked up user: "+data.screen_name);
 						console.log(data);
 						if (data.status.source == "web") {
 							var source="<a href='http://twitter.com/'>web</a>"
@@ -153,11 +153,29 @@
 				console.log("[index.html] auth(): Got Access Token Secret---: "+accessParams.oauth_token_secret);
 				console.log("[index.html] auth(): Writing for this sessions config.");
 				
-				// Write too Config.
-				writeTooConfig('{ access_token: "'+accessParams.oauth_token+'", access_token_secret: "'+accessParams.oauth_token_secret+'"}', "config.main.js");
+				var Twit = require('twitter');
+				window.config.access_token=accessParams.oauth_token;
+				window.config.access_token_secret=accessParams.oauth_token_secret;
+				var T = new Twit(window.config);
 				
-				// Init Application.
-				window.location.replace("load-index.html");
+				T.get('account/verify_credentials', function(err, data, response) {
+					if(typeof(err)!==('undefined')) {
+						console.log(err);
+					}
+					console.log("[twitter] /auth/ => [checkCreds]: Got a response from Twitter");
+					console.log(data);
+					if (data.status.source == "web") {
+						var source="<a href='http://twitter.com/'>web</a>"
+					} else {
+						var source=data.status.source
+					}
+					
+					// Write too Config.
+					writeToConfig('{ access_token: "'+accessParams.oauth_token+'", access_token_secret: "'+accessParams.oauth_token_secret+'", screen_name: "'+data.screen_name+'"}', "config.main.js");
+					
+					// Init Application.
+					window.location.replace("load-index.html");
+				});
 			},
 			function(data) { alert('Failed too Log you in, Try again Later.'); console.dir("[getPin.html] (): Returned Fail: "+data); }
 			);		
