@@ -158,7 +158,7 @@ function createFormattedTweet(tweet, ap, first) {
 		source = tweet.retweeted_status.source;
 		profile_image_url = tweet.retweeted_status.user.profile_image_url;
 		created = tweet.retweeted_status.created_at;
-		text.replace('RT @'+screenname+':', '');
+		text.replace('^RT @(\w+):', '');
 	}
 	
 	var final_text = "<div class='tweet'>";
