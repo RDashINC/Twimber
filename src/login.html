@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>vTweet</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="engine/public/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="engine/public/css/cover.css" rel="stylesheet">
+	
+	<script type="text/javascript">
+		function doLogin() {
+			var user = document.getElementById("login-username").value;
+			doLoadThing("login-button");
+			requestPin(user);
+		}
+	</script>
+	<script src="engine/public/js/config.js" type="text/javascript"></script>
+	<script src="engine/public/js/jquery-2.1.1.min.js" type="text/javascript"></script>
+	<script src="engine/public/js/bootstrap.js" type="text/javascript"></script>
+	<script src="engine/public/js/functions.js" type="text/javascript"></script>
+	<script src="engine/public/js/jsOAuth-1.1.js" type="text/javascript"></script>
+	<script src="engine/public/js/twitter.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		function loadContent(hash) {
+			console.log("[login.html] (): Hash Changed -- Changing Content accordingly.");
+			if(hash !== "" ) {
+				if(hash == "#contact") {
+					document.getElementById("nav-menu").innerHTML="<li><a href='#'>Home</a></li><li><a href='#about'>About</a></li><li class='active'><a href='#contact'>Contact</a></li>";
+					document.getElementById("main-disp").innerHTML="<h1 class='cover-heading'>UC</h1>";
+				} else if (hash == "#about") {
+					document.getElementById("nav-menu").innerHTML="<li><a href='#'>Home</a></li><li class='active'><a href='#about'>About</a></li><li><a href='#contact'>Contact</a></li>";
+					document.getElementById("main-disp").innerHTML="<h1 class='cover-heading'>UC</h1>";
+				} else if(hash == "#users") {
+					document.getElementById("nav-menu").innerHTML="<li><a href='#'>Home</a></li><li><a href='#about'>About</a></li><li><a href='#contact'>Contact</a></li>";
+					document.getElementById("main-disp").innerHTML="<h1 class='cover-heading'>User</h1><p class=lead><button class='btn btn-default' type='button' focus onclick='window.location.replace(\"load-index.html\");'>Login as Main</button>";
+				} else {
+					document.getElementById("main-disp").innerHTML="<h1 class='cover-heading'>OAuth PIN</h1><p class='lead'><input  style='color:black;' id='pin' type='number' placeholder='PIN'></p><p class='lead'><button class='btn btn-default' id='pinbutton' type='button' onclick='auth();'>Submit</button></p>";
+					$('#pin').keypress(function(e) {
+						if(e.which == 13) {
+							auth();
+						}
+					});
+				}
+			} else {
+				document.getElementById("nav-menu").innerHTML="<li class='active'><a href='#'>Home</a></li><li><a href='#about'>About</a></li><li><a href='#contact'>Contact</a></li>";
+				document.getElementById("main-disp").innerHTML="<h1 class='cover-heading'>Login</h1><p class='lead'><input style='color:black' type='text' id='login-username' placeholder='Username' required></p><p class='lead'><button id='login-button' onclick='doLogin();' class='btn btn-default' type='button' focus>Send</button></p>";
+				$('#login-username').keypress(function(e) {
+					if(e.which == 13) {
+						doLogin();
+					}
+				});
+			}
+		}
+		
+		// Handles page display.
+		// Initial Load.
+		$(document).ready(function() { loadContent(location.hash); });
+		$(window).on('hashchange', function () {
+			loadContent(location.hash);
+		});
+	</script>
+  </head>
+
+  <body>
+
+    <div class="site-wrapper">
+
+      <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+          <div class="masthead clearfix">
+            <div class="inner">
+              <h3 class="masthead-brand">vTweet</h3>
+              <ul id="nav-menu" class="nav masthead-nav">
+              </ul>
+            </div>
+          </div>
+
+          <div id='main-disp' class='inner cover'>
+		  </div>
+
+          <div class="mastfoot">
+            <div class="inner">
+              <p>vTweet, by <a href="https://twitter.com/rdashinc" target='_blank'>@rdashinc</a>.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+	<script>
+		function auth() {
+			doLoadThing("pinbutton");
+			console.log("[index.html] auth(): Started.");
+			var options = {
+				consumerKey: window.config.consumer_key,
+				consumerSecret: window.config.consumer_secret
+			};
+			var requestParams = location.hash.replace('#', '');
+			var oauth = OAuth(options);
+			var pin = document.getElementById("pin").value;
+			oauth.get('https://twitter.com/oauth/access_token?oauth_verifier='+pin+'&'+requestParams,
+
+			function(data) {
+				console.dir(data);
+					
+				// split the query string as needed						
+				var accessParams = {};
+				var qvars_tmp = data.text.split('&');
+				for (var i = 0; i < qvars_tmp.length; i++) {
+				var y = qvars_tmp[i].split('=');
+					accessParams[y[0]] = decodeURIComponent(y[1]);
+				}
+				console.log("[index.html] auth(): Got Access Token---: "+accessParams.oauth_token);
+				console.log("[index.html] auth(): Got Access Token Secret---: "+accessParams.oauth_token_secret);
+				console.log("[index.html] auth(): Writing for this sessions config.");
+				
+				// Write too Config.
+				writeTooConfig('{ access_token: "'+accessParams.oauth_token+'", access_token_secret: "'+accessParams.oauth_token_secret+'"}', "config.main.js");
+				
+				// Init Application.
+				window.location.replace("load-index.html");
+			},
+			function(data) { alert('Failed too Log you in, Try again Later.'); console.dir("[getPin.html] (): Returned Fail: "+data); }
+			);		
+		}
+	</script>
+  </body>
+</html>

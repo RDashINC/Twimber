@@ -17,10 +17,34 @@ function modifyDiv(id, content) {
 	return true;
 }
 function modifyTitle(id, content) {
-	console.log('[functions] modifyDiv: Changing '+id+'\'s title');
+	console.log('[functions] modifyTitle: Changing '+id+'\'s title');
 	document.getElementById(id).title=content;
 	return true;
 }
 
-var func_ver = "1.1";
+function writeTooConfig(array, file) {
+	console.log("[functions] writeTooConfig: Writing: '"+array+"' too config.");
+	var array = 'window.saved_config='+array;
+	var fs = require('fs');
+	var path = require('path');
+	var appdata = path.resolve(process.cwd(), "../../../Local");
+	var base_dir = appdata+"\\RDashINC\\vTweet";
+	
+	var exists = fs.existsSync(appdata+"/RDashINC");
+	if (exists === false) { fs.mkdir(path.resolve(process.cwd(), "../../../Local/RDashINC")); }
+	var exists = fs.existsSync(base_dir);
+	if (exists === false) {fs.mkdir(path.resolve(process.cwd(), "../../../Local/RDashINC/vTweet"));}
+	
+	// Write Too Config
+	var error = fs.writeFileSync(base_dir+"\\"+file, array);
+	if(error) throw error;
+	console.log("[functions] writeTooConfig: Done.");
+}
+
+function doLoadThing(id) {
+	modifyDiv(id, "<img src='engine/public/img/load.gif'>");
+}
+	
+
+var func_ver = "1.2.1";
 console.log("[functions] Functions V"+func_ver+" Loaded");

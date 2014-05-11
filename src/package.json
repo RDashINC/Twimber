@@ -2,10 +2,14 @@
   "name": "vTweet",
   "description": "A Twitter Client",
   "version": "1.0.1",
-  "main": "index.html",
+  "main": "load.html",
   "window": {
     "title": "vTweet",
-    "toolbar": true
+    "toolbar": true,
+	"width": 800,
+	"height": 600,
+    "min_width": 300,
+    "min_height": 500
   },
   "maintainers":[ {
 	 "name": "RainbowDashDCs",

@@ -1,0 +1,15 @@
+<head>
+	<script type='text/javascript'>
+		var fs = require('fs');
+		var path = require('path');
+		var appdata = path.resolve(process.cwd(), "../../../Local");
+		var base_dir = appdata+"\\RDashINC\\vTweet\\config.main.js";
+		fs.exists(base_dir, function(exists) {
+			if (exists === false) {
+				window.location.replace("login.html");
+			} else {
+				window.location.replace("login.html#users");
+			}
+		});
+	</script>
+</head>
