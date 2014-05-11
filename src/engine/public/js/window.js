@@ -1,6 +1,6 @@
 function checkCommand() {
 	var scr = document.body.scrollTop;
-	console.log("[functions] checkCommand: Attempting too call command");
+	console.log("[functions] checkCommand: Attempting to call command");
 	var id = getHashValue("id");
 	var action = getHashValue("action");
 	
@@ -13,12 +13,12 @@ function checkCommand() {
 		window.reply = true;
 		document.getElementById("tweet-send").value="@"+user_name+" ";
 		window.tweetid = id;
-		console.log("[window] checkCommand: window.reply set too true");
+		console.log("[window] checkCommand: window.reply set to true");
 		$( "#tweet-send" ).focus();
 	} else if(action == "clear") {
 		window.reply = false;
 		document.getElementById("tweet-send").value="";
-		console.log("[window] checkCommand: window.reply set too false, tweet-send cleared, hash reset.");
+		console.log("[window] checkCommand: window.reply set to false, tweet-send cleared, hash reset.");
 		location.hash="#";
 	}
 	location.hash="";
@@ -49,7 +49,7 @@ function tryToPost(id) {
 	console.log("[window] tryToPost: ctrl+return event fired on a '"+tag_name+"'");
 	if(tag_name == "INPUT") {
 		var func_to_exec = $("#"+id).attr("onclick");
-		console.log("[window] tryToPost: Trying too execute function '"+func_to_exec+"'");
+		console.log("[window] tryToPost: Trying to execute function '"+func_to_exec+"'");
 		eval(func_to_exec);
 		console.log("[window]: tryToPost: Attempt Made");
 	}

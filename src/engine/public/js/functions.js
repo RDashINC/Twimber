@@ -32,8 +32,8 @@ function modifyTitle(id, content) {
 	return true;
 }
 
-function writeTooConfig(array, file) {
-	console.log("[functions] writeTooConfig: Writing: '"+array+"' too config.");
+function writeToConfig(array, file) {
+	console.log("Writing: '"+array+"' to configuration.");
 	var array = 'window.saved_config='+array;
 	var fs = require('fs');
 	var path = require('path');
@@ -48,7 +48,7 @@ function writeTooConfig(array, file) {
 	// Write Too Config
 	var error = fs.writeFileSync(base_dir+"/"+file, array);
 	if(error) throw error;
-	console.log("[functions] writeTooConfig: Done.");
+	console.log("The configuration has been successfully written.");
 }
 
 function doLoadThing(id) {

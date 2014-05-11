@@ -154,12 +154,12 @@
 				console.log("[index.html] auth(): Writing for this sessions config.");
 				
 				// Write too Config.
-				writeTooConfig('{ access_token: "'+accessParams.oauth_token+'", access_token_secret: "'+accessParams.oauth_token_secret+'"}', "config.main.js");
+				writeToConfig('{ access_token: "'+accessParams.oauth_token+'", access_token_secret: "'+accessParams.oauth_token_secret+'"}', "config.main.js");
 				
 				// Init Application.
 				window.location.replace("load-index.html");
 			},
-			function(data) { alert('Failed too Log you in, Try again Later.'); console.dir("[getPin.html] (): Returned Fail: "+data); }
+			function(data) { alert('We were unable to log you in. Please try later.'); console.dir("[getPin.html] (): Returned Fail: "+data); }
 			);		
 		}
 	</script>
