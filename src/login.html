@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>vTweet</title>
+    <title>Twimber</title>
 
     <!-- Bootstrap core CSS -->
     <link href="engine/public/css/bootstrap.min.css" rel="stylesheet">
@@ -86,7 +86,7 @@
 						document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'><img src='"+data.profile_image_url.replace('normal', 'bigger')+"' alt='"+data.screen_name+"'></h1><p class='lead'>["+data.name+"] - "+processTweetLinks("@"+data.screen_name)+"</p><p id='status' class='lead'>\""+processTweetLinks(data.status.text)+"\"</p><p class='lead'>from "+source+"</p><p class='lead'><button id='mainLbutton' class='btn btn-default' type='button' focus onclick='loginAsMain();'>Login as @"+data.screen_name+"</button>&nbsp;<button class='btn btn-default' type='button' focus onclick='window.location=\"login.html#adduser\"'>Add User</button>&nbsp;<button class='btn btn-default' type='button' focus onclick='getUsersImages(\"#show_users\");'>Get Users</button><p class='lead'><div id='show_users'></div></p>";
 					});
 				} else if(hash == "#master") {
-					document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>vTweet</h1><p class='lead'><input  style='color:black;' id='pwd' type='password' placeholder='Master Password' required></p><p class='lead'><button class='btn btn-default' id='masterbutton' type='button' onclick='doAuthPage();'>Login</button></p><p class='lead'>&nbsp;</p>";
+					document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>Twimber</h1><p class='lead'><input  style='color:black;' id='pwd' type='password' placeholder='Master Password' required></p><p class='lead'><button class='btn btn-default' id='masterbutton' type='button' onclick='doAuthPage();'>Login</button></p><p class='lead'>&nbsp;</p>";
 					$('#pwd').keypress(function(e) {
 						if(e.which == 13) {
 							doAuthPage();
@@ -155,7 +155,7 @@
 
           <div class="masthead clearfix">
             <div class="inner">
-              <h3 class="masthead-brand">vTweet</h3>
+              <h3 class="masthead-brand">Twimber</h3>
               <ul id="nav-menu" class="nav masthead-nav">
               </ul>
             </div>
@@ -167,7 +167,7 @@
 
           <div class="mastfoot">
             <div style="display:inline;-webkit-border-top-left-radius: 15px;-webkit-border-bottom-left-radius: 15px; -webkit-border-top-right-radius: 15px;-webkit-border-bottom-right-radius: 15px;background: rgba(64, 64, 64, 0.8);" class="inner">
-              <p style='display:inline;-webkit-border-top-left-radius: 15px;-webkit-border-bottom-left-radius: 15px; -webkit-border-top-right-radius: 15px;-webkit-border-bottom-right-radius: 15px;background: rgba(64, 64, 64, 0.8);'>vTweet, by <a href="https://twitter.com/rdashinc" target='_blank'>@rdashinc</a>.</p>
+              <p style='display:inline;-webkit-border-top-left-radius: 15px;-webkit-border-bottom-left-radius: 15px; -webkit-border-top-right-radius: 15px;-webkit-border-bottom-right-radius: 15px;background: rgba(64, 64, 64, 0.8);'>Twimber, by <a href="https://twitter.com/rdashinc" target='_blank'>@rdashinc</a>.</p>
             </div>
           </div>
 

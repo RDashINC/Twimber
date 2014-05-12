@@ -1,7 +1,7 @@
-vTweet
+Twimber
 =========
 
-vTweet (VSTweet) is a HTML5 and Javascript based Desktop/Web Twitter Client.
+Twimber (VSTweet) is a HTML5 and Javascript based Desktop/Web Twitter Client.
 
 Features
 ----
@@ -20,7 +20,7 @@ Version
 Internals
 -----------
 
-vTweet uses a number of open source projects to work properly:
+Twimber uses a number of open source projects to work properly:
 
 * [Twitter Bootstrap] - great UI boilerplate for modern web apps
 * [jQuery] - duh

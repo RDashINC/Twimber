@@ -9,8 +9,8 @@ function captureVisibleScreen() {
 	/** Check DIRS **/
 	var exists = fs.existsSync(appdata+"/RDashINC");
 	if (exists === false) { fs.mkdir(path.resolve(process.cwd(), window.config_dir+"/RDashINC")); }
-	var exists = fs.existsSync(appdata+"/RDashINC/vTweet");
-	if (exists === false) {fs.mkdir(path.resolve(process.cwd(), window.config_dir+"/RDashINC/vTweet"));}
+	var exists = fs.existsSync(appdata+"/RDashINC/Twimber");
+	if (exists === false) {fs.mkdir(path.resolve(process.cwd(), window.config_dir+"/RDashINC/Twimber"));}
 	var exists = fs.existsSync(base_dir);
 	if (exists === false) {fs.mkdir(path.resolve(process.cwd(), window.config_dir+"/"+window.picture_dir));}
 	
@@ -18,11 +18,11 @@ function captureVisibleScreen() {
 	var date = Date.now();
     win.capturePage(function(img) {
 		var base64Data = img.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
-		require("fs").writeFile(base_dir+"/vTweet-"+date+".png", base64Data, 'base64', function(err) {
+		require("fs").writeFile(base_dir+"/Twimber-"+date+".png", base64Data, 'base64', function(err) {
 			console.log(err);
 		});
 	}, 'png');
-	console.log("[window] captureVisibleScreen: Screenshot saved at---:'"+base_dir+"/vTweet-"+date+".png"+"'");
+	console.log("[window] captureVisibleScreen: Screenshot saved at---:'"+base_dir+"/Twimber-"+date+".png"+"'");
 }
 
 /** Keyboard Shortcuts **/

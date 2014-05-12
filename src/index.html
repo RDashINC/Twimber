@@ -26,8 +26,27 @@
 			});
 		});
 	</script>
+	<style>
+		html {
+			background: url('engine/public/img/tweet_home.jpg') fixed #333;
+			background-size: cover;
+		}
+		body {
+			background: transparent;
+			color: #FFF;
+			text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+		}
+		a {
+			color: #CCC !important;
+		}
+		.item {
+			background: rgba(0,0,0,0.6);
+			padding: 15px;
+			margin-bottom: 15px;
+		}
+	</style>
 </head>
-<nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="background: rgba(255,255,255,0.85);border-bottom:1px solid #CCC;border-radius:none !important;box-shadow:0px 0px 5px rgba(0,0,0,0.2);">
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="background: rgba(0,0,0,0.55);border-bottom:1px solid #000;border-radius:none !important;box-shadow:0px 0px 5px rgba(0,0,0,0.2);">
   <div class="container-fluid">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
@@ -39,16 +58,16 @@
       <a class="navbar-brand" href="#"><sub>v</sub>Tweet</a>
     </div>
     <div class="collapse navbar-collapse">
-		<div class="navbar-right">
-				<a href="#id=null&action=clear" class="btn btn-default navbar-btn"><i class="fa fa-times"></i> Clear</a>
-				<a href="#" onclick="initStream();" class="btn btn-default navbar-btn"><i class="fa fa-refresh"></i> Reload Stream</a>
-				<a href="#" onclick="logout();" class="btn btn-default navbar-btn"><i class="fa fa-lock"></i> Logout</a>
-      	</div>
+		<ul class="nav navbar-nav navbar-right">
+				<li><a href="#id=null&action=clear"><i class="fa fa-times"></i> Clear</a></li>
+				<li><a href="#" onclick="initStream();"><i class="fa fa-refresh"></i> Reload Stream</a></li>
+				<li><a href="#" onclick="logout();"><i class="fa fa-lock"></i> Logout</a></li>
+      	</ul>
     </div>
   </div>
 </nav>
 	<body style="margin-top:60px;">
-		<div id="tweet-ctr" class="tweet container" style="margin:0;bottom:0;height:100%;overflow:auto;max-width:500px">
+		<div id="tweet-ctr" class="tweet container">
 		</div>
 		
 		<!-- Footer -->

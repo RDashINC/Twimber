@@ -37,12 +37,12 @@ function writeToConfig(array, file) {
 	var fs = require('fs');
 	var path = require('path');
 	var appdata = path.resolve(process.cwd(), window.config_dir);
-	var base_dir = appdata+"/RDashINC/vTweet";
+	var base_dir = appdata+"/RDashINC/Twimber";
 	
 	var exists = fs.existsSync(appdata+"/RDashINC");
 	if (exists === false) { fs.mkdir(path.resolve(process.cwd(), window.config_dir+"/RDashINC")); }
 	var exists = fs.existsSync(base_dir);
-	if (exists === false) {fs.mkdir(path.resolve(process.cwd(), window.config_dir+"/RDashINC/vTweet"));}
+	if (exists === false) {fs.mkdir(path.resolve(process.cwd(), window.config_dir+"/RDashINC/Twimber"));}
 	
 	// Write Too Config
 	var error = fs.writeFileSync(base_dir+"/"+file, array, { encoding: "utf8" });

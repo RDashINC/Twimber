@@ -16,7 +16,7 @@ function getMainUser(dir) {
 
 var path = require('path');
 var appdata = path.resolve(process.cwd(), config_dir);
-var base_dir = appdata+"/RDashINC/vTweet";
+var base_dir = appdata+"/RDashINC/Twimber";
 window.base_dir=base_dir;
 
 var file_exists = fs.existsSync(base_dir+"/main.json");
