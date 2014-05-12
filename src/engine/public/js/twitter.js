@@ -12,11 +12,17 @@ function initStream() {
 	
 	/** Check Creds **/
 	T.get('account/verify_credentials', function(err, data, response) {
+		if(err) {
+			parseTwitterError(err);
+		}
 		console.log("[twitter] /initStream/ => [checkCreds]: Got a response from Twitter");
 		console.log(data);
 	});
 	
 	T.get('statuses/home_timeline', { count: "150" }, function (err, data, response) {
+		if(err) {
+			parseTwitterError(err);
+		}
 		var tweets = data;
 		document.getElementById("tweet-ctr").innerHTML="";
 		var num = 0
@@ -51,6 +57,9 @@ function postStatus(status) {
 	var Twit = require('twitter')
 	var T = new Twit(window.config)
 	T.post('statuses/update', { status: status }, function(err, data, response) {
+		if(err) {
+			parseTwitterError(err);
+		}
 		console.log("[twitter] postStatus: Response "+err)
 	})
 	
@@ -70,6 +79,9 @@ function doReply(id, status) {
 	var Twit = require('twitter')
 	var T = new Twit(window.config)
 	T.post('statuses/update', { status: status, in_reply_to_status_id: id }, function(err, data, response) {
+		if(err) {
+			parseTwitterError(err);
+		}
 		console.log("[twitter] doReply: Response "+err)
 	})
 	
@@ -82,6 +94,9 @@ function loadMoreTweets(lastid) {
 	var Twit = require('twitter')
 	var T = new Twit(window.config)
 	T.get('statuses/home_timeline', { count: "50", max_id: lastid  }, function (err, data, response) {
+		if(err) {
+			parseTwitterError(err);
+		}
 		var tweets = data;
 		document.getElementById("tweet-ctr").innerHTML="";
 		tweets.forEach(function(tweet) {
@@ -147,6 +162,9 @@ function getDms() {
 	var Twit = require('twitter');
 	var T = new Twit(window.config);
 	T.get('direct_messages', { count: "200"}, function (err, data, response) {
+		if(err) {
+			parseTwitterError(err);
+		}
 		console.log(data);
 	});
 }
@@ -163,6 +181,9 @@ function getUsersImages(div, link) {
 		if(path.extname(file) === ".js") {
 			var user = file.split('.')[1];
 			T.get('users/show', { screen_name: user } , function(err, data, response) {
+				if(err) {
+					parseTwitterError(err);
+				}
 				var config = decryptConfig(data.screen_name, window.base_dir);
 				var profile_image = data.profile_image_url;
 				global.final_text = "<img class='login_image' onclick='doLoginNoInput(\""+user+"\")' src='"+profile_image+"' alt='"+user+"'>";
@@ -188,6 +209,9 @@ function getTwitterUserInfo(user) {
 	eval(getConfigFile());
 	var T = new Twit(window.config);
 	T.get('users/show', { screen_name: user } , function(err, data, response) {
+		if(err) {
+			parseTwitterError(err);
+		}
 		console.log("[twitter] /twitter/ => [user/show]: Looked up user: "+user);
 		console.log(data);
 		return data;
@@ -322,13 +346,21 @@ var K = function () {
     }
 }();
 
+function parseTwitterError(err) {
+	/** Throws Exceptions **/
+	throw err.message;
+}
+
 
 function fav(id) {
 	console.log("[twitter] fav: Attempting to fav tweet with id of '"+id+"'");
 	var Twit = require('twitter');
 	var T = new Twit(window.config);
 	T.post('favorites/create', { id: id }, function (err, data, response) {
-		console.log(err)
+		if(err) {
+			parseTwitterError(err);
+		}
+		console.log(data);
 	})
 	document.getElementById(id+"-fav").value="";
 	document.getElementById(id+"-fav").innerHTML="<span class='tweet favourited'><i class='fa fa-heart'></i></span>";
@@ -339,7 +371,10 @@ function rt(id) {
 	var Twit = require('twitter');
 	var T = new Twit(window.config);
 	T.post('statuses/retweet/:id', { id: id }, function (err, data, response) {
-		console.log(err)
+		if(err) {
+			parseTwitterError(err);
+		}
+		console.log(data);
 	})
 	document.getElementById(id+"-rt").value="";
 	document.getElementById(id+"-rt").innerHTML="<span class='tweet retweeted'>Retweeted&nbsp;</span>";
@@ -350,7 +385,10 @@ function del(id) {
 	var Twit = require('twitter');
 	var T = new Twit(window.config);
 	T.post('statuses/delete/:id', { id: id }, function (err, data, response) {
-		console.log(err)
+		if(err) {
+			parseTwitterError(err);
+		}
+		console.log(data);
 	})
 }
 

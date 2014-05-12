@@ -75,6 +75,9 @@
 					
 					/** Check Creds **/
 					T.get('users/show', { screen_name: window.config.screen_name } , function(err, data, response) {
+						if(err) {
+							parseTwitterError(err);
+						}
 						console.log("[twitter] /loadContent/ => [user/show]: Looked up user: "+data.screen_name);
 						console.log(data);
 						if (data.status.source == "web") {
@@ -214,6 +217,9 @@
 				var T = new Twit(window.config);
 				
 				T.get('account/verify_credentials', function(err, data, response) {
+					if(err) {
+						parseTwitterError(err);
+					}
 					if(typeof(err)!==('undefined')) {
 						console.log(err);
 					}
