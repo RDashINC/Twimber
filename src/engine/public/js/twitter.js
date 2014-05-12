@@ -278,9 +278,9 @@ function createFormattedTweet(tweet, ap, first) {
 	var final_text = final_text+"	<img style='float:left;padding:0 1ex 1ex 0; margin-bottom:5px;' src='"+profile_image_url+"'>";
 	var final_text = final_text+"	<a class='from_user' href='http://twitter.com/"+screenname+"'>["+name+"] @"+screenname+"</a>";
 	var final_text = final_text+processTweetLinks("	<p id='tweet-text' class='contents'> "+text+" </p>");
-	var final_text = final_text+"	<span title='"+created_orig+"' class='timestamp'>"+created+"</span>";
+	var final_text = final_text+"	<span title='"+created_orig+"' class='timestamp'>"+created+"</span> - ";
 	if(favorited === true) {
-		var final_text = final_text+"	<a id='"+id+"-fav' class='favourited' href='#'><i class='fa fa-heart'></i></a>&nbsp;";
+		var final_text = final_text+"	<a id='"+id+"-fav' class='favourited' href='#'><i class='fa fa-heart' style='color:red;'></i></a>&nbsp;";
 	} else {
 		var final_text = final_text+"	<a id='"+id+"-fav' class='favourite' href='#id="+id+"&action=fav'><i class='fa fa-heart-o'></i></a>&nbsp;";
 	}
@@ -289,7 +289,7 @@ function createFormattedTweet(tweet, ap, first) {
 	} else {
 		var final_text = final_text+"	<a id='"+id+"-rt' class='retweet' href='#id="+id+"&action=rt'><i class='fa fa-retweet'></i></a>&nbsp;";
 	}
-	var final_text = final_text+"	<a id='"+id+"-reply' class='reply' href='#id="+id+"&action=reply&un="+screenname+"'><i class='fa fa-reply'></i></a>&nbsp;|&nbsp;";
+	var final_text = final_text+"	<a id='"+id+"-reply' class='reply' href='#id="+id+"&action=reply&un="+screenname+"'><i class='fa fa-reply'></i></a>&nbsp;–&nbsp;";
 	var final_text = final_text+"	<a class='src'>"+source+"</a>";
 	var final_text = final_text+"</div>";
 	if(typeof(ap)!=='undefined') {
@@ -363,7 +363,7 @@ function fav(id) {
 		console.log(data);
 	})
 	document.getElementById(id+"-fav").value="";
-	document.getElementById(id+"-fav").innerHTML="<span class='tweet favourited'><i class='fa fa-heart'></i></span>";
+	document.getElementById(id+"-fav").innerHTML="<span class='tweet favourited'><i class='fa fa-heart' style='color:red;'></i></span>";
 }
 
 function rt(id) {
@@ -377,7 +377,7 @@ function rt(id) {
 		console.log(data);
 	})
 	document.getElementById(id+"-rt").value="";
-	document.getElementById(id+"-rt").innerHTML="<span class='tweet retweeted'>Retweeted&nbsp;</span>";
+	document.getElementById(id+"-rt").innerHTML="<span class='tweet retweeted'><i class='fa fa-retweet'></i>'d</span>";
 }
 
 function del(id) {
