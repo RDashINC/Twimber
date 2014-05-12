@@ -36,7 +36,7 @@ function initStream() {
 }
 
 function postStatus(status) {
-	console.log("[twitter] postStatus: attempting too post status '"+status+"'");
+	console.log("[twitter] postStatus: attempting to post status '"+status+"'");
 	var Twit = require('twitter')
 	var T = new Twit(window.config)
 	T.post('statuses/update', { status: status }, function(err, data, response) {
@@ -55,7 +55,7 @@ function logout() {
 }
 
 function doReply(id, status) {
-	console.log("[twitter] doReply: attempting too post status '"+status+"', in reply too the ID '"+id+"'");
+	console.log("[twitter] doReply: attempting to post status '"+status+"', in reply to the ID '"+id+"'");
 	var Twit = require('twitter')
 	var T = new Twit(window.config)
 	T.post('statuses/update', { status: status, in_reply_to_status_id: id }, function(err, data, response) {
@@ -80,7 +80,7 @@ function loadMoreTweets(lastid) {
 }
 
 function requestPin(user) {
-	console.log("[twitter] requestPin: Attempting too start an OAuth PIN Req.");
+	console.log("[twitter] requestPin: Attempting to start an OAuth PIN Req.");
 		var options = {
 			consumerKey: window.config.consumer_key,
 			consumerSecret: window.config.consumer_secret
@@ -106,7 +106,7 @@ function requestPin(user) {
 
 
 function reload() {
-	console.log("[twitter] reload: Attempting too reload.");
+	console.log("[twitter] reload: Attempting to reload.");
 	var Twit = require('twitter');
 	var T = new Twit(window.config);
 
@@ -213,7 +213,7 @@ function createFormattedTweet(tweet, ap, first) {
 }
 
 function fav(id) {
-	console.log("[twitter] fav: Attempting too fav tweet with id of '"+id+"'");
+	console.log("[twitter] fav: Attempting to fav tweet with id of '"+id+"'");
 	var Twit = require('twitter');
 	var T = new Twit(window.config);
 	T.post('favorites/create', { id: id }, function (err, data, response) {
@@ -224,7 +224,7 @@ function fav(id) {
 }
 
 function rt(id) {
-	console.log("[twitter] rt: Attempting too RT tweet with id of '"+id+"'");
+	console.log("[twitter] rt: Attempting to RT tweet with id of '"+id+"'");
 	var Twit = require('twitter');
 	var T = new Twit(window.config);
 	T.post('statuses/retweet/:id', { id: id }, function (err, data, response) {
@@ -235,7 +235,7 @@ function rt(id) {
 }
 
 function del(id) {
-	console.log("[twitter] del: Attempting too del your tweet with an id of '"+id+"'");
+	console.log("[twitter] del: Attempting to del your tweet with an id of '"+id+"'");
 	var Twit = require('twitter');
 	var T = new Twit(window.config);
 	T.post('statuses/delete/:id', { id: id }, function (err, data, response) {

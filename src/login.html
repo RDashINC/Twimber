@@ -157,6 +157,9 @@
 				window.config.access_token=accessParams.oauth_token;
 				window.config.access_token_secret=accessParams.oauth_token_secret;
 				var T = new Twit(window.config);
+		
+				// Write too Config.
+				writeToConfig('{ access_token: "'+accessParams.oauth_token+'", access_token_secret: "'+accessParams.oauth_token_secret+'"}', "config.main.js");
 				
 				T.get('account/verify_credentials', function(err, data, response) {
 					if(typeof(err)!==('undefined')) {
@@ -177,7 +180,7 @@
 					window.location.replace("load-index.html");
 				});
 			},
-			function(data) { alert('Failed too Log you in, Try again Later.'); console.dir("[getPin.html] (): Returned Fail: "+data); }
+			function(data) { alert('We were unable to log you in. Please try later.'); console.dir("[getPin.html] (): Returned Fail: "+data); }
 			);		
 		}
 	</script>
