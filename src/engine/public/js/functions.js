@@ -34,7 +34,6 @@ function modifyTitle(id, content) {
 
 function writeToConfig(array, file) {
 	console.log("Writing: '"+array+"' to configuration.");
-	var array = 'window.saved_config='+array;
 	var fs = require('fs');
 	var path = require('path');
 	var appdata = path.resolve(process.cwd(), window.config_dir);
@@ -46,9 +45,18 @@ function writeToConfig(array, file) {
 	if (exists === false) {fs.mkdir(path.resolve(process.cwd(), window.config_dir+"/RDashINC/vTweet"));}
 	
 	// Write Too Config
-	var error = fs.writeFileSync(base_dir+"/"+file, array);
+	var error = fs.writeFileSync(base_dir+"/"+file, array, { encoding: "utf8" });
 	if(error) throw error;
 	console.log("The configuration has been successfully written.");
+}
+
+function getConfigFile() {
+	var fs = require('fs');
+	var config_file = fs.readFileSync("engine/public/js/config.js", { encoding: 'utf8' }, function(err, data) { 
+		if (err) throw err; 
+	});
+	
+	return config_file;
 }
 
 function doLoadThing(id) {

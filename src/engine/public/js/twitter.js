@@ -6,7 +6,6 @@ function initStream() {
 	/**
 	 * This is essentially the beginning function. (for twitter).
 	**/
-	
 	document.getElementById("tweet-ctr").innerHTML="<img style=\"display: block;margin-left:auto;margin-right:auto;\" src=\"engine/public/img/ajax-loader.gif\"></img>";
 	var Twit = require('twitter')
 	var T = new Twit(window.config)
@@ -31,6 +30,12 @@ function initStream() {
 			}
 		});
 		var data = "";
+		if(typeof(global.user_stream)==='undefined') {
+			console.log("[twitter] Initial stream started");
+		} else {
+			console.log("[twitter] Old Stream Found, trying to kill");
+			global.user_stream.stop();
+		}
 		reload();
 	})
 }
@@ -50,7 +55,7 @@ function logout() {
 	/** Anything Logout based goes here **/
 	var Twit = require('twitter')
 	var T = new Twit(window.config)
-	window.stream.stop();
+	global.user_stream.stop();
 	window.location.replace("login.html");
 }
 
@@ -110,13 +115,18 @@ function reload() {
 	var Twit = require('twitter');
 	var T = new Twit(window.config);
 
-	window.stream = T.stream('user');
-
-	window.stream.on('tweet', function (tweet) {
+	global.user_stream = T.stream('user');	
+	global.user_stream.on('tweet', function (tweet) {
 		console.log("[twitter]: /stream/ => reload: Stream updating.");
 		console.log(tweet);
 		createFormattedTweet(tweet);
 	});
+	if(typeof(global.user_stream)==='undefined') {
+		// Nothing
+	} else {
+		console.log("[twitter] Starting Stream");
+		global.user_stream.start();
+	}
 }
 
 function processTweetLinks(text) {

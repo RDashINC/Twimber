@@ -22,6 +22,7 @@
 			requestPin(user);
 		}
 	</script>
+	<script src="engine/public/js/aes.js" type="text/javascript"></script>
 	<script src="engine/public/js/config.js" type="text/javascript"></script>
 	<script src="engine/public/js/jquery-2.1.1.min.js" type="text/javascript"></script>
 	<script src="engine/public/js/jquery.hotkeys.js" type="text/javascript"></script>
@@ -43,6 +44,14 @@
 					document.getElementById("nav-menu").innerHTML="<li><a href='#'>Home</a></li><li class='active'><a href='#about'>About</a></li><li><a href='#contact'>Contact</a></li>";
 					document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>UC</h1><p class='lead'>&nbsp;</p>";
 				} else if(hash == "#users") {
+					if(typeof(global.pwd)==='undefined') {
+						console.log("window.pwd is not defined. Returning.");
+						window.location("load.html");
+					}
+					/** Reload Config: TODO MAKE FUNCTION **/
+					var config_file = getConfigFile();
+					eval(config_file);
+					
 					var Twit = require('twitter');
 					var T = new Twit(window.config);
 					
@@ -56,11 +65,18 @@
 							var source=data.status.source
 						}
 						document.getElementById("nav-menu").innerHTML="<li><a href='#'>Home</a></li><li><a href='#about'>About</a></li><li><a href='#contact'>Contact</a></li>";
-						document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'><img src='"+data.profile_image_url.replace('normal', 'bigger')+"' alt='"+data.screen_name+"'></h1><p class='lead'>["+data.name+"] - @"+data.screen_name+"</p><p id='status' class='lead'>\""+processTweetLinks(data.status.text)+"\"</p><p class='lead'>from "+source+"</p><p class='lead'><button class='btn btn-default' type='button' focus onclick='window.location.replace(\"load-index.html\");'>Login as @"+data.screen_name+"</button><p class='lead'>&nbsp;</p>";
+						document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'><img src='"+data.profile_image_url.replace('normal', 'bigger')+"' alt='"+data.screen_name+"'></h1><p class='lead'>["+data.name+"] - "+processTweetLinks("@"+data.screen_name)+"</p><p id='status' class='lead'>\""+processTweetLinks(data.status.text)+"\"</p><p class='lead'>from "+source+"</p><p class='lead'><button id='mainLbutton' class='btn btn-default' type='button' focus onclick='loginAsMain();'>Login as @"+data.screen_name+"</button><p class='lead'>&nbsp;</p>";
+					});
+				} else if(hash == "#master") {
+					document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>vTweet</h1><p class='lead'><input  style='color:black;' id='pwd' type='password' placeholder='Master Password' required></p><p class='lead'><button class='btn btn-default' id='masterbutton' type='button' onclick='doAuthPage();'>Login</button></p><p class='lead'>&nbsp;</p>";
+					$('#pwd').keypress(function(e) {
+						if(e.which == 13) {
+							doAuthPage();
+						}
 					});
 				} else {
-					document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>OAuth PIN</h1><p class='lead'><input  style='color:black;' id='pin' type='number' placeholder='PIN'></p><p class='lead'><button class='btn btn-default' id='pinbutton' type='button' onclick='auth();'>Submit</button></p><p class='lead'>&nbsp;</p>";
-					$('#pin').keypress(function(e) {
+					document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>Setup</h1><p class='lead'><input  style='color:black;' id='pin' type='text' placeholder='PIN' required></p><p class='lead'><input  style='color:black;' id='pwd' type='password' placeholder='Master Password' required></p><p class='lead'><button class='btn btn-default' id='pinbutton' type='button' onclick='auth();'>Submit</button></p><p class='lead'>&nbsp;</p>";
+					$('#pwd').keypress(function(e) {
 						if(e.which == 13) {
 							auth();
 						}
@@ -137,6 +153,11 @@
 			var requestParams = location.hash.replace('#', '');
 			var oauth = OAuth(options);
 			var pin = document.getElementById("pin").value;
+			var pwd = document.getElementById("pwd").value;
+			if(typeof(pin)==='undefined') {
+				window.location("load.html");
+				alert("Empty Pin");
+			}
 			oauth.get('https://twitter.com/oauth/access_token?oauth_verifier='+pin+'&'+requestParams,
 
 			function(data) {
@@ -157,9 +178,6 @@
 				window.config.access_token=accessParams.oauth_token;
 				window.config.access_token_secret=accessParams.oauth_token_secret;
 				var T = new Twit(window.config);
-		
-				// Write too Config.
-				writeToConfig('{ access_token: "'+accessParams.oauth_token+'", access_token_secret: "'+accessParams.oauth_token_secret+'"}', "config.main.js");
 				
 				T.get('account/verify_credentials', function(err, data, response) {
 					if(typeof(err)!==('undefined')) {
@@ -173,15 +191,35 @@
 						var source=data.status.source
 					}
 					
+					var config = '{ "access_token": "'+accessParams.oauth_token+'", "access_token_secret": "'+accessParams.oauth_token_secret+'", "screen_name": "'+data.screen_name+'"}';
+					config = CryptoJS.AES.encrypt(config, pwd);
+					
 					// Write too Config.
-					writeToConfig('{ access_token: "'+accessParams.oauth_token+'", access_token_secret: "'+accessParams.oauth_token_secret+'", screen_name: "'+data.screen_name+'"}', "config.main.js");
+					writeToConfig(config, "config.main.js");
+					
+					// Store Paswd.
+					global.pwd = pwd;
 					
 					// Init Application.
 					window.location.replace("load-index.html");
 				});
 			},
-			function(data) { alert('We were unable to log you in. Please try later.'); console.dir("[getPin.html] (): Returned Fail: "+data); }
+			function(data) { alert('Failed too Log you in, Try again Later.'); console.dir("[getPin.html] (): Returned Fail: "+data); }
 			);		
+		}
+	</script>
+	<script type="text/javascript">
+		function loginAsMain() {
+			doLoadThing("mainLbutton");
+			window.location.replace("index.html");
+		}
+	</script>
+	<script type="text/javascript">
+		function doAuthPage() {
+			doLoadThing("masterbutton");
+			var pwd = document.getElementById("pwd").value;
+			global.pwd = pwd;
+			window.location.replace("login.html#users");
 		}
 	</script>
   </body>
