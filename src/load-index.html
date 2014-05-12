@@ -6,7 +6,7 @@
 			var fs = require('fs');
 			var path = require('path');
 			var appdata = path.resolve(process.cwd(), window.config_dir);
-			var base_dir = appdata+"\\RDashINC\\vTweet\\config.main.js";
+			var base_dir = appdata+"/RDashINC/vTweet/config.main.js";
 			fs.exists(base_dir, function(exists) {
 				if (exists === false) {
 					window.location.replace("error.html");
