@@ -41,16 +41,20 @@ if (file_exists === false) {
 	} else {
 		window.saved_config=data;
 		window.saved_config = CryptoJS.AES.decrypt(window.saved_config, global.pwd);
-		window.saved_config = window.saved_config.toString(CryptoJS.enc.Utf8)
-		window.saved_config = JSON.parse(window.saved_config);
-		window.config = {
-			consumer_key: ck,
-			consumer_secret: cs,
-			access_token: window.saved_config.access_token,
-			access_token_secret: window.saved_config.access_token_secret,
-			screen_name: window.saved_config.screen_name,
-			config_dir: config_dir,
-			picture_dir: picture_dir
-		};
+		window.saved_config = window.saved_config.toString(CryptoJS.enc.Utf8);
+		if(window.saved_config) {
+			window.saved_config = JSON.parse(window.saved_config);
+			window.config = {
+				consumer_key: ck,
+				consumer_secret: cs,
+				access_token: window.saved_config.access_token,
+				access_token_secret: window.saved_config.access_token_secret,
+				screen_name: window.saved_config.screen_name,
+				config_dir: config_dir,
+				picture_dir: picture_dir
+			};
+		} else {
+			throw "Incorrect Password";
+		}
 	}
 }
