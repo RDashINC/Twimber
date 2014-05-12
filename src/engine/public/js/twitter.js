@@ -37,6 +37,12 @@ function initStream() {
 			global.user_stream.stop();
 		}
 		reload();
+		setInterval(function(){
+			console.log("[twitter] (): Updating tweet times <3");
+			$('.timestamp').each(function(i, obj) {
+				obj.innerHTML = relative_time(obj.title);
+			});
+		}, 5000);
 	})
 }
 
@@ -119,6 +125,10 @@ function reload() {
 	global.user_stream.on('tweet', function (tweet) {
 		console.log("[twitter]: /stream/ => reload: Stream updating.");
 		console.log(tweet);
+		console.log("[twitter] /stream/ => reload: Updating old tweets time.");
+		$('.timestamp').each(function(i, obj) {
+			obj.innerHTML = relative_time(obj.title);
+		});
 		createFormattedTweet(tweet);
 	});
 }
@@ -220,6 +230,7 @@ function createFormattedTweet(tweet, ap, first) {
 	var profile_image_url = tweet.user.profile_image_url;
 	var protect = tweet.user.protected;
 	var created= tweet.created_at;
+	var created_orig = created;
 	var retweeted = tweet.retweeted;
 	var favorited = tweet.favorited;
 	console.log(favorited);
@@ -233,15 +244,17 @@ function createFormattedTweet(tweet, ap, first) {
 		source = tweet.retweeted_status.source;
 		profile_image_url = tweet.retweeted_status.user.profile_image_url;
 		created = tweet.retweeted_status.created_at;
+		created_orig = created;
 		retweeted = tweet.retweeted;
 		text.replace('^RT @(\w+):', '');
 	}
+	created = relative_time(created);
 	
 	var final_text = "<div class='tweet item'>";
 	var final_text = final_text+"	<img style='float:left;padding:0 1ex 1ex 0; margin-bottom:5px;' src='"+profile_image_url+"'>";
 	var final_text = final_text+"	<a class='from_user' href='http://twitter.com/"+screenname+"'>["+name+"] @"+screenname+"</a>";
 	var final_text = final_text+processTweetLinks("	<p id='tweet-text' class='contents'> "+text+" </p>");
-	var final_text = final_text+"	<span class='timestamp'>"+created+"</span>";
+	var final_text = final_text+"	<span title='"+created_orig+"' class='timestamp'>"+created+"</span>";
 	if(favorited === true) {
 		var final_text = final_text+"	<a id='"+id+"-fav' class='favourited' href='#'><i class='fa fa-heart'></i></a>&nbsp;";
 	} else {
@@ -264,11 +277,7 @@ function createFormattedTweet(tweet, ap, first) {
 			console.log("[twitter] createFormattedTweet: Got a first tweet");
 			$('#tweet-ctr').prepend(final_text);
 		} else {
-			scroll =$(document).scrollTop();
-			
-			var firstMsg = $('#first_tweet');
 			$('#tweet-ctr').prepend(final_text);
-			$(document).scrollTop(firstMsg.offset().top);
 		}
 	}
 	$("#tweet-text").linkify();
@@ -282,6 +291,37 @@ function createFormattedTweet(tweet, ap, first) {
 		}
 	}
 }
+
+function relative_time(time) {
+	var tdate = time;
+    var system_date = new Date(Date.parse(tdate));
+    var user_date = new Date();
+    if (K.ie) {
+        system_date = Date.parse(tdate.replace(/( \+)/, ' UTC$1'))
+    }
+    var diff = Math.floor((user_date - system_date) / 1000);
+    if (diff <= 1) {return "just now";}
+    if (diff < 20) {return diff + " seconds ago";}
+    if (diff < 40) {return "half a minute ago";}
+    if (diff < 60) {return "less than a minute ago";}
+    if (diff <= 90) {return "one minute ago";}
+    if (diff <= 3540) {return Math.round(diff / 60) + " minutes ago";}
+    if (diff <= 5400) {return "1 hour ago";}
+    if (diff <= 86400) {return Math.round(diff / 3600) + " hours ago";}
+    if (diff <= 129600) {return "1 day ago";}
+    if (diff < 604800) {return Math.round(diff / 86400) + " days ago";}
+    if (diff <= 777600) {return "1 week ago";}
+    return "on " + system_date;
+}
+
+// from http://widgets.twimg.com/j/1/widget.js
+var K = function () {
+    var a = navigator.userAgent;
+    return {
+        ie: a.match(/MSIE\s([^;]*)/)
+    }
+}();
+
 
 function fav(id) {
 	console.log("[twitter] fav: Attempting to fav tweet with id of '"+id+"'");

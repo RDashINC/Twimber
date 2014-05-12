@@ -24,6 +24,10 @@
 			$("#tweet-send").bind('keydown', 'ctrl+return', function() {
 				tryToPost("tweet-send-button");
 			});
+			$("#tweet-send").bind('keydown', 'enter', function() {
+				tryToPost("tweet-send-button");
+			});
+			$("#tweet-send").bind('keydown', 'ctrl+c', resetCharLimit);
 		});
 	</script>
 	<style>
@@ -62,6 +66,7 @@
 				<li><a href="#id=null&action=clear"><i class="fa fa-times"></i> Clear</a></li>
 				<li><a href="#" onclick="initStream();"><i class="fa fa-refresh"></i> Reload Stream</a></li>
 				<li><a href="#" onclick="logout();"><i class="fa fa-lock"></i> Logout</a></li>
+				<li><a id="char-left" href="#">0</a></li>
       	</ul>
     </div>
   </div>
@@ -81,6 +86,8 @@
 			</div>
 		<script type="text/javascript">
 		function statusFunc() {
+			doLoadThing("tweet-send-button");
+			document.getElementById('tweet-send-button').innerHTML="<i class='fa fa-twitter'></i>";
 			if(window.reply===true) {
 				var id = window.tweetid;
 				var status = document.getElementById("tweet-send").value;
@@ -96,5 +103,22 @@
 		}
 		</script>
 		<script type="text/javascript">initStream();</script>
+		<script>
+			var limit = 140;
+			var txt =  $('input[id$=tweet-send]');
+			$('#char-left').text(limit+" characters left~");
+			$(txt).keypress(function() {
+				var len = $(this).val().length;
+				if (len > limit) {
+					//this.value = this.value.substring(0, 50);
+					$(this).addClass('goRed');
+					$('#char-left').text(len - limit + " characters exceeded.. please type less! (╯°□°）╯︵ ┻━┻");
+					return false;
+				} else {
+					$(this).removeClass('goRed');
+					$('#char-left').text(limit - len + " characters left~");
+				}
+			});
+		</script>
 	</body>
 </html>

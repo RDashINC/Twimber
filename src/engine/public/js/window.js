@@ -17,12 +17,22 @@ function checkCommand() {
 		$( "#tweet-send" ).focus();
 	} else if(action == "clear") {
 		window.reply = false;
-		document.getElementById("tweet-send").value="";
+		
+		// Reset Counter
+		resetCharLimit();
+		
 		console.log("[window] checkCommand: window.reply set to false, tweet-send cleared, hash reset.");
 		location.hash="#";
 	}
 	location.hash="";
 	document.body.scrollTop = scr;
+}
+
+function resetCharLimit() {
+	var txt =  $('input[id$=tweet-send]');
+	$('#char-left').text(140+" characters left~");
+	$('#tweet-send').val("");
+	$('#tweet-send').focus();
 }
 
 

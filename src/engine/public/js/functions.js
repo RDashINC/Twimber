@@ -62,6 +62,14 @@ function getConfigFile() {
 function doLoadThing(id) {
 	modifyDiv(id, "<img src='engine/public/img/load.gif'>");
 }
+
+function attemptToInclude(file) {
+	var fs = require('fs');
+	var config_file = fs.readFileSync("engine/public/js/"+file, { encoding: 'utf8' }, function(err, data) { 
+		if (err) throw err; 
+	});
+	return file;
+}
 	
 
 var func_ver = "1.2.1";

@@ -51,8 +51,8 @@ if (file_exists === false) {
 	} else {
 		window.saved_config=data;
 		window.saved_config = CryptoJS.AES.decrypt(window.saved_config, global.pwd);
-		window.saved_config = window.saved_config.toString(CryptoJS.enc.Utf8);
 		if(window.saved_config) {
+			window.saved_config = window.saved_config.toString(CryptoJS.enc.Utf8);
 			window.saved_config = JSON.parse(window.saved_config);
 			window.config = {
 				consumer_key: ck,

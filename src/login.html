@@ -86,7 +86,7 @@
 						document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'><img src='"+data.profile_image_url.replace('normal', 'bigger')+"' alt='"+data.screen_name+"'></h1><p class='lead'>["+data.name+"] - "+processTweetLinks("@"+data.screen_name)+"</p><p id='status' class='lead'>\""+processTweetLinks(data.status.text)+"\"</p><p class='lead'>from "+source+"</p><p class='lead'><button id='mainLbutton' class='btn btn-default' type='button' focus onclick='loginAsMain();'>Login as @"+data.screen_name+"</button>&nbsp;<button class='btn btn-default' type='button' focus onclick='window.location=\"login.html#adduser\"'>Add User</button>&nbsp;<button class='btn btn-default' type='button' focus onclick='getUsersImages(\"#show_users\");'>Get Users</button><p class='lead'><div id='show_users'></div></p>";
 					});
 				} else if(hash == "#master") {
-					document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>Twimber</h1><p class='lead'><input  style='color:black;' id='pwd' type='password' placeholder='Master Password' required></p><p class='lead'><button class='btn btn-default' id='masterbutton' type='button' onclick='doAuthPage();'>Login</button></p><p class='lead'>&nbsp;</p>";
+					document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>Twimber</h1><p class='lead'><input  style='color:black;' id='pwd' type='password' placeholder='Master Password' required focus></p><p class='lead'><button class='btn btn-default' id='masterbutton' type='button' onclick='doAuthPage();'>Login</button></p><p class='lead'>&nbsp;</p>";
 					$('#pwd').keypress(function(e) {
 						if(e.which == 13) {
 							doAuthPage();
@@ -161,7 +161,7 @@
             </div>
           </div>
 
-          <div style="-webkit-border-top-left-radius: 15px;-webkit-border-bottom-left-radius: 15px; -webkit-border-top-right-radius: 15px;-webkit-border-bottom-right-radius: 15px;display:block; background: rgba(64, 64, 64, 0.8);" id='main-disp' class='inner cover'>
+          <div style="word-wrap:break-word;-webkit-border-top-left-radius: 15px;-webkit-border-bottom-left-radius: 15px; -webkit-border-top-right-radius: 15px;-webkit-border-bottom-right-radius: 15px;display:block; background: rgba(64, 64, 64, 0.8);" id='main-disp' class='inner cover'>
 			<img src='engine/public/img/page_load.gif'>
 		  </div>
 
