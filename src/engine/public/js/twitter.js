@@ -121,12 +121,6 @@ function reload() {
 		console.log(tweet);
 		createFormattedTweet(tweet);
 	});
-	if(typeof(global.user_stream)==='undefined') {
-		// Nothing
-	} else {
-		console.log("[twitter] Starting Stream");
-		global.user_stream.start();
-	}
 }
 
 function processTweetLinks(text) {
