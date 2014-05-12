@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="engine/public/css/bootstrap.css" type="text/css"></script>
+	<link rel="stylesheet" href="engine/public/css/bootstrap.css" type="text/css"/>
+	<link rel="stylesheet" href="engine/public/css/font-awesome.min.css" type="text/css"/>
 	<script src="engine/public/js/config.js" type="text/javascript"></script>
 	<script src="engine/public/js/jquery-2.1.1.min.js" type="text/javascript"></script>
 	<script src="engine/public/js/jquery.hotkeys.js" type="text/javascript"></script>
@@ -25,30 +26,36 @@
 		});
 	</script>
 </head>
-	<nav class="navbar navbar-inverse" role="navigation">
-		<div class="navbar-header">
-			<div class="navbar-brand">vTweet</div>
-		</div>
-	</nav>
-	<nav style="margin-top:-20px; height:50px;" class="navbar navbar-default navbar-static-top" role="navigation">
-		<div class="navbar-header">
-			<ul class="nav navbar-nav">
-				<li><a href="#id=null&action=clear">Clear Input</a></li>
-				<li onclick="initStream();"><a href="#">Restart Stream</a></li>
-				<li onclick="logout();"><a>Logout</a></li>
-			</ul>
-		</div>
-	</nav>
-	<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="background: rgba(255,255,255,0.85);border-bottom:1px solid #CCC;border-radius:none !important;box-shadow:0px 0px 5px rgba(0,0,0,0.2);">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#"><sub>v</sub>Tweet</a>
+    </div>
+    <div class="collapse navbar-collapse">
+		<div class="navbar-right">
+				<a href="#id=null&action=clear" class="btn btn-default navbar-btn"><i class="fa fa-times"></i> Clear</a>
+				<a href="#" onclick="initStream();" class="btn btn-default navbar-btn"><i class="fa fa-refresh"></i> Reload Stream</a>
+				<a href="#" onclick="logout();" class="btn btn-default navbar-btn"><i class="fa fa-lock"></i> Logout</a>
+      	</div>
+    </div>
+  </div>
+</nav>
+	<body style="margin-top:60px;">
 		<div id="tweet-ctr" class="tweet container" style="margin:0;bottom:0;height:100%;overflow:auto;max-width:500px">
 		</div>
 		
 		<!-- Footer -->
 			<div style='bottom: 0px; position: fixed;'>
 				<div class="input-group">
-					<input id="tweet-send" type="text" class="form-control">
+					<input id="tweet-send" type="text" class="form-control" style="border-radius: 0 !important;" placeholder="Tweet tweet?">
 					<span class="input-group-btn">
-						<button id='tweet-send-button' onclick="statusFunc()" class="btn btn-default" type="button" focus>Send</button>
+						<button id='tweet-send-button' onclick="statusFunc()" class="btn btn-default"  style="border-radius: 0 !important;" type="button" focus><i class="fa fa-twitter"></i></button>
 					</span>
 				</div>
 			</div>
