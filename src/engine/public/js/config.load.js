@@ -1,8 +1,17 @@
 function loadUser(user, dir) {
+	var fs = require('fs');
 	var data = fs.readFileSync(dir+"/config."+user+".js", { encoding: 'utf8' }, function(err, data) { 
 		if (err) throw err; 
 	});
 	return data;
+}
+
+function getMainUser(dir) {
+	var fs = require('fs');
+	var data = fs.readFileSync(dir+"/main.json", { encoding: 'utf8' }, function(err, data) { 
+		if (err) throw err; 
+	});
+	return JSON.parse(data);
 }
 
 var path = require('path');
@@ -10,7 +19,7 @@ var appdata = path.resolve(process.cwd(), config_dir);
 var base_dir = appdata+"/RDashINC/vTweet";
 window.base_dir=base_dir;
 
-var file_exists = fs.existsSync(base_dir);
+var file_exists = fs.existsSync(base_dir+"/main.json");
 
 if (file_exists === false) {
 	window.config = {
@@ -20,7 +29,12 @@ if (file_exists === false) {
 		picture_dir: picture_dir
 	}
 } else {
-	var data = loadUser("main", base_dir);
+	if(typeof(global.twitter_user)==='undefined') {
+		var main = getMainUser(base_dir).main;
+		var data = loadUser(main, base_dir);
+	} else {
+		var data = loadUser(global.twitter_user, base_dir);
+	}
 	/**
    	 * Decrypt Config File
      *

@@ -56,7 +56,7 @@ function logout() {
 	var Twit = require('twitter')
 	var T = new Twit(window.config)
 	global.user_stream.stop();
-	window.location.replace("login.html");
+	window.location.replace("login.html#users");
 }
 
 function doReply(id, status) {
@@ -99,7 +99,7 @@ function requestPin(user) {
  
 			function(data) {
 				console.dir(data);
-				window.open('https://twitter.com/oauth/authorize?'+data.text+"&screen_name="+user);
+				window.open('https://twitter.com/oauth/authorize?'+data.text+"&screen_name="+user+"&force_login=true");
 				requestParams = data.text;
 				window.location.replace('login.html#'+requestParams);
 			},
@@ -134,26 +134,72 @@ function processTweetLinks(text) {
 }
 
 function getDms() {
-	var Twit = require('twitter')
-	var T = new Twit(window.config)
+	var Twit = require('twitter');
+	var T = new Twit(window.config);
 	T.get('direct_messages', { count: "200"}, function (err, data, response) {
 		console.log(data);
-	})
+	});
 }
 
-function getUsers() {
+function getUsersImages(div, link) {
 	var fs = require('fs');
 	var path = require('path');
 	eval(getConfigFile());
-	var files = fs.readdirSync(appdata+"/RDashINC/vTweet/");
+	var Twit = require('twitter');
+	var T = new Twit(window.config);
+	var files = fs.readdirSync(window.base_dir);
+	global.final_text = "";
 	files.forEach(function(file) {
 		if(path.extname(file) === ".js") {
-			console.log("[twitter] Loaded User: '"+file.split('.')[1]+"' Config.");
+			var user = file.split('.')[1];
+			T.get('users/show', { screen_name: user } , function(err, data, response) {
+				var config = decryptConfig(data.screen_name, window.base_dir);
+				var profile_image = data.profile_image_url;
+				global.final_text = "<img class='login_image' onclick='doLoginNoInput(\""+user+"\")' src='"+profile_image+"' alt='"+user+"'>";
+				$(div).prepend(global.final_text);
+			});
 		}
 	});
 }
 
+function decryptConfig(user, dir) {
+	var config = loadUser(user, dir);
+	var config = CryptoJS.AES.decrypt(config, global.pwd);
+	var config = config.toString(CryptoJS.enc.Utf8);
+	if(config) {
+		return JSON.parse(config);
+	} else {
+		throw "Failed Too Decrypt User '"+user+"' config, Wrong Password?";
+	}
+}
+
+function getTwitterUserInfo(user) {
+	var Twit = require('twitter');
+	eval(getConfigFile());
+	var T = new Twit(window.config);
+	T.get('users/show', { screen_name: user } , function(err, data, response) {
+		console.log("[twitter] /twitter/ => [user/show]: Looked up user: "+user);
+		console.log(data);
+		return data;
+	});
+}
+
+function getMainUser() {
+	var fs = require('fs');
+	var data = fs.readFileSync(dir+"/main.json", { encoding: 'utf8' }, function(err, data) { 
+		if (err) throw err; 
+	});
+	return JSON.parse(data);
+}
+
+function userExists(user) {
+	var fs = require('fs');
+	var file_exists = fs.existsSync(base_dir+"/config."+user+".js");
+	return file_exists;
+}
+
 function loadUser(user, dir) {
+	var fs = require('fs');
 	var data = fs.readFileSync(dir+"/config."+user+".js", { encoding: 'utf8' }, function(err, data) { 
 		if (err) throw err; 
 	});
@@ -176,6 +222,7 @@ function createFormattedTweet(tweet, ap, first) {
 	var created= tweet.created_at;
 	var retweeted = tweet.retweeted;
 	var favorited = tweet.favorited;
+	console.log(favorited);
 	if(typeof(tweet.retweeted_status)==='undefined') {
 		var retweeted_stat=false;
 	} else {
@@ -186,6 +233,7 @@ function createFormattedTweet(tweet, ap, first) {
 		source = tweet.retweeted_status.source;
 		profile_image_url = tweet.retweeted_status.user.profile_image_url;
 		created = tweet.retweeted_status.created_at;
+		retweeted = tweet.retweeted;
 		text.replace('^RT @(\w+):', '');
 	}
 	
@@ -194,12 +242,12 @@ function createFormattedTweet(tweet, ap, first) {
 	var final_text = final_text+"	<a class='tweet from_user' href='http://twitter.com/"+screenname+"'>["+name+"] @"+screenname+"</a>";
 	var final_text = final_text+processTweetLinks("	<p id='tweet-text' class='tweet contents'> "+text+" </p>");
 	var final_text = final_text+"	<span class='tweet timestamp'>"+created+"</span>";
-	if(favorited) {
+	if(favorited === true) {
 		var final_text = final_text+"	<a id='"+id+"-fav' class='tweet favourited' href='#'>Favourited</a>&nbsp;";
 	} else {
 		var final_text = final_text+"	<a id='"+id+"-fav' class='tweet favourite' href='#id="+id+"&action=fav'>Favourite</a>&nbsp;";
 	}
-	if(retweeted) {
+	if(retweeted === true) {
 		var final_text = final_text+"	<a id='"+id+"-rt' class='tweet retweeted' href='#'>Retweeted</a>&nbsp;";
 	} else {
 		var final_text = final_text+"	<a id='"+id+"-rt' class='tweet retweet' href='#id="+id+"&action=rt'>Retweet</a>&nbsp;";

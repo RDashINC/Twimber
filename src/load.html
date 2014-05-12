@@ -1,13 +1,13 @@
 <head>
 	<script src="engine/public/js/aes.js" type="text/javascript"></script>
 	<script src="engine/public/js/config.js" type="text/javascript"></script>
-	<script src="engine/public/js/jquery-2.1.1.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="engine/public/js/jquery-2.1.1.min.js"></script>
 	<script type='text/javascript'>
 		$(document).ready(function() {
 			var fs = require('fs');
 			var path = require('path');
 			var appdata = path.resolve(process.cwd(), window.config_dir);
-			var base_dir = appdata+"/RDashINC/vTweet/config.main.js";
+			var base_dir = window.base_dir+"/main.json";
 			fs.exists(base_dir, function(exists) {
 				if (exists === false) {
 					window.location.replace("login.html");

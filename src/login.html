@@ -19,7 +19,26 @@
 		function doLogin() {
 			var user = document.getElementById("login-username").value;
 			doLoadThing("login-button");
-			requestPin(user);
+			if(userExists(user)===true) {
+				global.twitter_user = user;
+				// Init Application.
+				window.location.replace("login.html#users");
+				$(document).ready(function() {
+					getUsersImages("#show_users", true);
+				});
+			} else {
+				requestPin(user);
+			}
+		}
+		function doLoginNoInput(user) {
+			doLoadThing("main-disp");
+			if(userExists(user)===true) {
+				global.twitter_user = user;
+				window.location.reload();
+				window.location.replace("login.html#users");
+			} else {
+				requestPin(user);
+			}
 		}
 	</script>
 	<script src="engine/public/js/aes.js" type="text/javascript"></script>
@@ -45,12 +64,11 @@
 					document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>UC</h1><p class='lead'>&nbsp;</p>";
 				} else if(hash == "#users") {
 					if(typeof(global.pwd)==='undefined') {
-						console.log("window.pwd is not defined. Returning.");
+						console.log("global.pwd is not defined. Returning.");
 						window.location("load.html");
 					}
 					/** Reload Config: TODO MAKE FUNCTION **/
-					var config_file = getConfigFile();
-					eval(config_file);
+					eval(getConfigFile());
 					
 					var Twit = require('twitter');
 					var T = new Twit(window.config);
@@ -62,10 +80,10 @@
 						if (data.status.source == "web") {
 							var source="<a href='http://twitter.com/'>web</a>"
 						} else {
-							var source=data.status.source
+							var source=data.status.source;
 						}
 						document.getElementById("nav-menu").innerHTML="<li><a href='#'>Home</a></li><li><a href='#about'>About</a></li><li><a href='#contact'>Contact</a></li>";
-						document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'><img src='"+data.profile_image_url.replace('normal', 'bigger')+"' alt='"+data.screen_name+"'></h1><p class='lead'>["+data.name+"] - "+processTweetLinks("@"+data.screen_name)+"</p><p id='status' class='lead'>\""+processTweetLinks(data.status.text)+"\"</p><p class='lead'>from "+source+"</p><p class='lead'><button id='mainLbutton' class='btn btn-default' type='button' focus onclick='loginAsMain();'>Login as @"+data.screen_name+"</button><p class='lead'>&nbsp;</p>";
+						document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'><img src='"+data.profile_image_url.replace('normal', 'bigger')+"' alt='"+data.screen_name+"'></h1><p class='lead'>["+data.name+"] - "+processTweetLinks("@"+data.screen_name)+"</p><p id='status' class='lead'>\""+processTweetLinks(data.status.text)+"\"</p><p class='lead'>from "+source+"</p><p class='lead'><button id='mainLbutton' class='btn btn-default' type='button' focus onclick='loginAsMain();'>Login as @"+data.screen_name+"</button>&nbsp;<button class='btn btn-default' type='button' focus onclick='window.location=\"login.html#adduser\"'>Add User</button>&nbsp;<button class='btn btn-default' type='button' focus onclick='getUsersImages(\"#show_users\");'>Get Users</button><p class='lead'><div id='show_users'></div></p>";
 					});
 				} else if(hash == "#master") {
 					document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>vTweet</h1><p class='lead'><input  style='color:black;' id='pwd' type='password' placeholder='Master Password' required></p><p class='lead'><button class='btn btn-default' id='masterbutton' type='button' onclick='doAuthPage();'>Login</button></p><p class='lead'>&nbsp;</p>";
@@ -74,8 +92,19 @@
 							doAuthPage();
 						}
 					});
+				} else if (hash =="#adduser") {
+					document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>Add User</h1><p class='lead'><input style='color:black' type='text' id='login-username' placeholder='Username' required></p><p class='lead'><button id='login-button' onclick='doLogin();' class='btn btn-default' type='button' focus>Send</button></p><p class='lead'>&nbsp;</p>";
+					$('#login-username').keypress(function(e) {
+						if(e.which == 13) {
+							doLogin();
+						}
+					});
 				} else {
-					document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>Setup</h1><p class='lead'><input  style='color:black;' id='pin' type='text' placeholder='PIN' required></p><p class='lead'><input  style='color:black;' id='pwd' type='password' placeholder='Master Password' required></p><p class='lead'><button class='btn btn-default' id='pinbutton' type='button' onclick='auth();'>Submit</button></p><p class='lead'>&nbsp;</p>";
+					if(typeof(global.pwd)==='undefined') {
+						document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>Setup</h1><p class='lead'><input  style='color:black;' id='pin' type='text' placeholder='PIN' required></p><p class='lead'><input  style='color:black;' id='pwd' type='password' placeholder='Master Password' required></p><p class='lead'><button class='btn btn-default' id='pinbutton' type='button' onclick='auth();'>Submit</button></p><p class='lead'>&nbsp;</p>";
+					} else {
+						document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>Setup</h1><p class='lead'><input  style='color:black;' id='pin' type='text' placeholder='PIN' required></p><p class='lead'><input  style='color:black;' id='pwd' type='password' value='"+global.pwd+"' disabled required></p><p class='lead'><button class='btn btn-default' id='pinbutton' type='button' onclick='auth();'>Submit</button></p><p class='lead'>&nbsp;</p>";
+					}
 					$('#pwd').keypress(function(e) {
 						if(e.which == 13) {
 							auth();
@@ -83,13 +112,18 @@
 					});
 				}
 			} else {
-				document.getElementById("nav-menu").innerHTML="<li class='active'><a href='#'>Home</a></li><li><a href='#about'>About</a></li><li><a href='#contact'>Contact</a></li>";
-				document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>Login</h1><p class='lead'><input style='color:black' type='text' id='login-username' placeholder='Username' required></p><p class='lead'><button id='login-button' onclick='doLogin();' class='btn btn-default' type='button' focus>Send</button></p><p class='lead'>&nbsp;</p>";
-				$('#login-username').keypress(function(e) {
-					if(e.which == 13) {
-						doLogin();
-					}
-				});
+				eval(getConfigFile());
+				if(typeof(window.config.screen_name)==='undefined') {
+					document.getElementById("nav-menu").innerHTML="<li class='active'><a href='#'>Home</a></li><li><a href='#about'>About</a></li><li><a href='#contact'>Contact</a></li>";
+					document.getElementById("main-disp").innerHTML="<p class='lead'>&nbsp;</p><h1 class='cover-heading'>Login</h1><p class='lead'><input style='color:black' type='text' id='login-username' placeholder='Username' required></p><p class='lead'><button id='login-button' onclick='doLogin();' class='btn btn-default' type='button' focus>Send</button></p><p class='lead'>&nbsp;</p>";
+					$('#login-username').keypress(function(e) {
+						if(e.which == 13) {
+							doLogin();
+						}
+					});
+				} else {
+					window.location.replace('login.html#users');
+				}
 			}
 		}
 		
@@ -195,14 +229,16 @@
 					config = CryptoJS.AES.encrypt(config, pwd);
 					
 					// Write too Config.
-					writeToConfig(config, "config.main.js");
-					writeToConfig('{ "main":"main" }', "main.json");
+					writeToConfig(config, "config."+data.screen_name+".js");
+					writeToConfig('{ "main":"'+data.screen_name+'" }', "main.json");
 					
 					// Store Paswd.
 					global.pwd = pwd;
 					
+					global.twitter_user = data.screen_name;
+					
 					// Init Application.
-					window.location.replace("load-index.html");
+					window.location.replace("login.html#users");
 				});
 			},
 			function(data) { alert('Failed too Log you in, Try again Later.'); console.dir("[getPin.html] (): Returned Fail: "+data); }
