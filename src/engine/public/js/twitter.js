@@ -7,8 +7,8 @@ function initStream() {
 	 * This is essentially the beginning function. (for twitter).
 	**/
 	document.getElementById("tweet-ctr").innerHTML="<img style=\"display: block;margin-left:auto;margin-right:auto;\" src=\"engine/public/img/ajax-loader.gif\"></img>";
-	var Twit = require('twitter')
-	var T = new Twit(window.config)
+	var Twit = require('twitter');
+	var T = new Twit(window.config);
 	
 	/** Check Creds **/
 	T.get('account/verify_credentials', function(err, data, response) {
@@ -25,17 +25,17 @@ function initStream() {
 		}
 		var tweets = data;
 		document.getElementById("tweet-ctr").innerHTML="";
-		var num = 0
+		var num = 0;
 		tweets.forEach(function(tweet) {
 			var num = num + 1;
-			if(num = 1) {
+			if(num == 1) {
 				createFormattedTweet(tweet, true, true);
 				document.getElementsByClassName('tweet')[1].id="first_tweet";
 			} else {
 				createFormattedTweet(tweet, true);
 			}
 		});
-		var data = "";
+		data = "";
 		if(typeof(global.user_stream)==='undefined') {
 			console.log("[twitter] Initial stream started");
 		} else {
@@ -49,41 +49,43 @@ function initStream() {
 				obj.innerHTML = relative_time(obj.title);
 			});
 		}, 5000);
-	})
+	});
 }
 
 function postStatus(status) {
 	console.log("[twitter] postStatus: attempting to post status '"+status+"'");
-	var Twit = require('twitter')
-	var T = new Twit(window.config)
+	var Twit = require('twitter');
+	var T = new Twit(window.config);
 	T.post('statuses/update', { status: status }, function(err, data, response) {
 		if(err) {
 			parseTwitterError(err);
 		}
-		console.log("[twitter] postStatus: Response "+err)
-	})
+		console.log("[twitter] postStatus: Response "+data);
+	});
+	
+	postTwitterSuccess("Tweet: Posted Successfully!");
 	
 	return true;
 }
 
 function logout() {
 	/** Anything Logout based goes here **/
-	var Twit = require('twitter')
-	var T = new Twit(window.config)
+	var Twit = require('twitter');
+	var T = new Twit(window.config);
 	global.user_stream.stop();
 	window.location.replace("login.html#users");
 }
 
 function doReply(id, status) {
 	console.log("[twitter] doReply: attempting to post status '"+status+"', in reply to the ID '"+id+"'");
-	var Twit = require('twitter')
-	var T = new Twit(window.config)
+	var Twit = require('twitter');
+	var T = new Twit(window.config);
 	T.post('statuses/update', { status: status, in_reply_to_status_id: id }, function(err, data, response) {
 		if(err) {
 			parseTwitterError(err);
 		}
-		console.log("[twitter] doReply: Response "+err)
-	})
+		console.log("[twitter] doReply: Response "+err);
+	});
 	
 	return true;
 }
@@ -91,8 +93,8 @@ function doReply(id, status) {
 function loadMoreTweets(lastid) {
 	$( "#tweet-ctr" ).append("<img style=\"display: block;margin-left:auto;margin-right:auto;\" src=\"engine/public/img/tweet-load.gif\"></img>");
 	console.log("[twitter] loadMoreTweets: Getting more tweets from before id '"+lastid+"'");
-	var Twit = require('twitter')
-	var T = new Twit(window.config)
+	var Twit = require('twitter');
+	var T = new Twit(window.config);
 	T.get('statuses/home_timeline', { count: "50", max_id: lastid  }, function (err, data, response) {
 		if(err) {
 			parseTwitterError(err);
@@ -195,8 +197,8 @@ function getUsersImages(div, link) {
 
 function decryptConfig(user, dir) {
 	var config = loadUser(user, dir);
-	var config = CryptoJS.AES.decrypt(config, global.pwd);
-	var config = config.toString(CryptoJS.enc.Utf8);
+	config = CryptoJS.AES.decrypt(config, global.pwd);
+	config = config.toString(CryptoJS.enc.Utf8);
 	if(config) {
 		return JSON.parse(config);
 	} else {
@@ -270,7 +272,6 @@ function createFormattedTweet(tweet, ap, first) {
 		created = tweet.retweeted_status.created_at;
 		created_orig = created;
 		retweeted = tweet.retweeted;
-		text.replace('^RT @(\w+):', '');
 	}
 	created = relative_time(created);
 	
@@ -308,7 +309,7 @@ function createFormattedTweet(tweet, ap, first) {
 	
 	var elements = document.getElementsByClassName('tweet hashtag');
 	for (var i = 0; i < elements.length; i++) { 
-		if(elements[i].title == "") {
+		if(elements[i].title === "") {
 			var hashtag = elements[i].innerHTML.replace( /#/, "" );
 			console.log("[twitter] createFormattedTweet: Replacing Hashtag '"+hashtag+"' with def.");
 			elements[i].title=getHashTagDef(hashtag);
@@ -321,7 +322,7 @@ function relative_time(time) {
     var system_date = new Date(Date.parse(tdate));
     var user_date = new Date();
     if (K.ie) {
-        system_date = Date.parse(tdate.replace(/( \+)/, ' UTC$1'))
+        system_date = Date.parse(tdate.replace(/( \+)/, ' UTC$1'));
     }
     var diff = Math.floor((user_date - system_date) / 1000);
     if (diff <= 1) {return "just now";}
@@ -343,14 +344,16 @@ var K = function () {
     var a = navigator.userAgent;
     return {
         ie: a.match(/MSIE\s([^;]*)/)
-    }
+    };
 }();
 
 function parseTwitterError(err) {
-	/** Throws Exceptions **/
-	throw err.message;
+	$("#twitter_success").prepend("<div id='error' class='alert alert-danger'>"+message+"</div>");
 }
 
+function postTwitterSuccess(message) {
+	$("#twitter_success").prepend("<div id='success' class='alert alert-success'>"+message+"</div>");
+}
 
 function fav(id) {
 	console.log("[twitter] fav: Attempting to fav tweet with id of '"+id+"'");
@@ -361,9 +364,10 @@ function fav(id) {
 			parseTwitterError(err);
 		}
 		console.log(data);
-	})
+	});
 	document.getElementById(id+"-fav").value="";
 	document.getElementById(id+"-fav").innerHTML="<span class='tweet favourited'><i class='fa fa-heart' style='color:red;'></i></span>";
+	postTwitterSuccess("Tweet: Favorited Successfully!");
 }
 
 function rt(id) {
@@ -375,9 +379,10 @@ function rt(id) {
 			parseTwitterError(err);
 		}
 		console.log(data);
-	})
+	});
 	document.getElementById(id+"-rt").value="";
 	document.getElementById(id+"-rt").innerHTML="<span class='tweet retweeted'><i class='fa fa-retweet'></i>'d</span>";
+	postTwitterSuccess("Tweet: Retweeted Successfully!");
 }
 
 function del(id) {
@@ -389,7 +394,8 @@ function del(id) {
 			parseTwitterError(err);
 		}
 		console.log(data);
-	})
+	});
+	postTwitterSuccess("Tweet: Retweeted Successfully!");
 }
 
 var twit_ver="1.1-dev";

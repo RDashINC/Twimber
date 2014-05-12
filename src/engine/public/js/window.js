@@ -57,7 +57,7 @@ window.onhashchange = function () {
 function tryToPost(id) {
 	var tag_name = $(document.activeElement).prop("tagName");
 	console.log("[window] tryToPost: ctrl+return event fired on a '"+tag_name+"'");
-	if(tag_name == "INPUT") {
+	if(tag_name == "TEXTAREA") {
 		var func_to_exec = $("#"+id).attr("onclick");
 		console.log("[window] tryToPost: Trying to execute function '"+func_to_exec+"'");
 		eval(func_to_exec);
