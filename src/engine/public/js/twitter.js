@@ -141,6 +141,30 @@ function getDms() {
 	})
 }
 
+function getUsers() {
+	var fs = require('fs');
+	var path = require('path');
+	eval(getConfigFile());
+	var files = fs.readdirSync(appdata+"/RDashINC/vTweet/");
+	files.forEach(function(file) {
+		if(path.extname(file) === ".js") {
+			console.log("[twitter] Loaded User: '"+file.split('.')[1]+"' Config.");
+		}
+	});
+}
+
+function loadUser(user, dir) {
+	var data = fs.readFileSync(dir+"/config."+user+".js", { encoding: 'utf8' }, function(err, data) { 
+		if (err) throw err; 
+	});
+	return data;
+}
+
+function setMain(user) {
+	writeToConfig('{ "main":"'+user+'"}', "main.json");
+	console.log("[twitter] Set '"+user+"' as main user");
+}
+
 function createFormattedTweet(tweet, ap, first) {
 	var text = tweet.text;
 	var screenname = tweet.user.screen_name;
@@ -195,13 +219,9 @@ function createFormattedTweet(tweet, ap, first) {
 		} else {
 			scroll =$(document).scrollTop();
 			
-			if(scroll > 1) {
-				var firstMsg = $('#first_tweet');
-				$('#tweet-ctr').prepend(final_text);
-				$(document).scrollTop(firstMsg.offset().top);
-			} else {
-				$('#tweet-ctr').prepend(final_text);
-			}
+			var firstMsg = $('#first_tweet');
+			$('#tweet-ctr').prepend(final_text);
+			$(document).scrollTop(firstMsg.offset().top);
 		}
 	}
 	$("#tweet-text").linkify();
