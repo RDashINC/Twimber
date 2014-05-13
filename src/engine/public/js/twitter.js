@@ -348,7 +348,7 @@ var K = function () {
 }();
 
 function parseTwitterError(err) {
-	$("#twitter_success").prepend("<div id='error' class='alert alert-danger'>"+message+"</div>");
+	$("#twitter_errors").prepend("<div id='error' class='alert alert-danger'>"+err.message+"</div>");
 }
 
 function postTwitterSuccess(message) {
@@ -362,12 +362,13 @@ function fav(id) {
 	T.post('favorites/create', { id: id }, function (err, data, response) {
 		if(err) {
 			parseTwitterError(err);
+		} else {
+			postTwitterSuccess("Tweet: Favorited Successfully!");
 		}
 		console.log(data);
 	});
 	document.getElementById(id+"-fav").value="";
 	document.getElementById(id+"-fav").innerHTML="<span class='tweet favourited'><i class='fa fa-heart' style='color:red;'></i></span>";
-	postTwitterSuccess("Tweet: Favorited Successfully!");
 }
 
 function rt(id) {
@@ -377,12 +378,13 @@ function rt(id) {
 	T.post('statuses/retweet/:id', { id: id }, function (err, data, response) {
 		if(err) {
 			parseTwitterError(err);
+		} else {
+			postTwitterSuccess("Tweet: Retweeted Successfully!");
 		}
 		console.log(data);
 	});
 	document.getElementById(id+"-rt").value="";
 	document.getElementById(id+"-rt").innerHTML="<span class='tweet retweeted'><i class='fa fa-retweet'></i>'d</span>";
-	postTwitterSuccess("Tweet: Retweeted Successfully!");
 }
 
 function del(id) {
@@ -392,10 +394,11 @@ function del(id) {
 	T.post('statuses/delete/:id', { id: id }, function (err, data, response) {
 		if(err) {
 			parseTwitterError(err);
+		} else {
+			postTwitterSuccess("Tweet: Deleted Successfully!");
 		}
 		console.log(data);
 	});
-	postTwitterSuccess("Tweet: Retweeted Successfully!");
 }
 
 var twit_ver="1.1-dev";
