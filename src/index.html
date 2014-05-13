@@ -11,6 +11,7 @@
 	<script src="engine/public/js/jquery-2.1.1.min.js" type="text/javascript"></script>
 	<script src="engine/public/js/jquery.hotkeys.js" type="text/javascript"></script>
 	<script src="engine/public/js/jquery.linkify.min.js" type="text/javascript"></script>
+	<script src="engine/public/js/jquery.cursorend.min.js" type="text/javascript"></script>
 	<script src="engine/public/js/functions.js" type="text/javascript"></script>
 	<script src="engine/public/js/bootstrap.js" type="text/javascript"></script>
 	<script src="engine/public/js/window.js" type="text/javascript"></script>
@@ -58,6 +59,21 @@
 			min-width: 275px;
 			position: fixed;
 		}
+		
+		.btn-tweet-wrapper {
+			display:-moz-box;
+			-moz-box-pack:center;
+			-moz-box-align:center;		
+
+			display:-webkit-box;
+			-webkit-box-pack:center;
+			-webkit-box-align:center;
+		}
+		
+		#char-left {
+			pointer-events: none;
+			cursor: not-allowed;
+		}
 	</style>
 </head>
 <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="background: rgba(0,0,0,0.55);border-bottom:1px solid #000;border-radius:none !important;box-shadow:0px 0px 5px rgba(0,0,0,0.2);">
@@ -76,7 +92,6 @@
 				<li><a href="#id=null&action=clear"><i class="fa fa-times"></i> Clear</a></li>
 				<li><a href="#" onclick="initStream();"><i class="fa fa-refresh"></i> Reload Stream</a></li>
 				<li><a href="#" onclick="logout();"><i class="fa fa-lock"></i> Logout</a></li>
-				<li><a id="char-left" href="#">0</a></li>
       	</ul>
     </div>
   </div>
@@ -88,8 +103,11 @@
 			<div class="item sidebar-box">
 				<div style='text-align:center' id='user_div'></div>
 				<textarea id="tweet-send" class="form-control" placeholder="Hello world."></textarea><br>
-				<button id='tweet-send-button' onclick="statusFunc()" class="btn btn-default btn-block" type="button" focus>
-				Tweet <i class="fa fa-twitter"></i></button>
+				<div class="btn-group btn-tweet-wrapper">
+					<button id='tweet-send-button' onclick="statusFunc()" class="btn btn-default" type="button" focus> <i class="fa fa-twitter"> Tweet</i></button>
+					<button id='char-left' style="color: #333;background-color: #fff;border-color:#ccc;" class="btn" type="button" focus> 0 </i></button>
+					<button id='tweet-select-file' onclick="selectFile()" class="btn btn-default" type="button" focus> Upload <i class="fa fa-upload"></i></button>
+				</div>
 				<div>&nbsp;</div>
 				<div id='twitter_errors'></div>
 				<div id='twitter_success'></div>
@@ -97,8 +115,8 @@
 		</div>
 		<script type="text/javascript">
 		function statusFunc() {
+			var before = document.getElementById('tweet-send-button').innerHTML;
 			doLoadThing("tweet-send-button");
-			document.getElementById('tweet-send-button').innerHTML="<i class='fa fa-twitter'></i>";
 			if(window.reply===true) {
 				var id = window.tweetid;
 				var status = document.getElementById("tweet-send").value;
@@ -111,23 +129,24 @@
 				postStatus(status);
 				document.getElementById("tweet-send").value="";
 			}
+			document.getElementById('tweet-send-button').innerHTML=before;
 		}
 		</script>
 		<script type="text/javascript">initStream();</script>
 		<script>
 			var limit = 140;
 			var txt =  $('input[id$=tweet-send]');
-			$('#char-left').text(limit+" characters left~");
+			$('#char-left').text(limit);
 			$(txt).keypress(function() {
 				var len = $(this).val().length;
 				if (len > limit) {
 					//this.value = this.value.substring(0, 50);
 					$(this).addClass('goRed');
-					$('#char-left').text(len - limit + " characters exceeded.. please type less! (╯°□°）╯︵ ┻━┻");
+					$('#char-left').text(len - limit);
 					return false;
 				} else {
 					$(this).removeClass('goRed');
-					$('#char-left').text(limit - len + " characters left~");
+					$('#char-left').text(limit - len);
 				}
 			});
 		</script>
@@ -167,9 +186,9 @@
 				if(err) {
 					parseTwitterError(err);
 				}
-				console.log("[index.html] Load USer image resp: ");
+				console.log("[index.html] Load User image resp: ");
 				console.log(data);
-				document.getElementById("user_div").innerHTML="<img src='"+data.profile_image_url.replace('normal', 'bigger')+"' alt='"+data.screen_name+"'><p class='lead'>"+data.name+"<br>(@"+data.screen_name+")</p>";
+				document.getElementById("user_div").innerHTML="<img src='"+data.profile_image_url.replace('normal', 'bigger')+"' alt='"+data.screen_name+"'><h2>"+data.name+"</h2><h3>@"+data.screen_name+"</h2>";
 			});
 		</script>
 	</body>
