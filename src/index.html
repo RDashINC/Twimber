@@ -11,7 +11,7 @@
 	<script src="engine/public/js/jquery-2.1.1.min.js" type="text/javascript"></script>
 	<script src="engine/public/js/jquery.hotkeys.js" type="text/javascript"></script>
 	<script src="engine/public/js/jquery.linkify.min.js" type="text/javascript"></script>
-	<script src="engine/public/js/jquery.cursorend.min.js" type="text/javascript"></script>
+	<script src="engine/public/js/jquery.autogrow.js" type="text/javascript"></script>
 	<script src="engine/public/js/functions.js" type="text/javascript"></script>
 	<script src="engine/public/js/bootstrap.js" type="text/javascript"></script>
 	<script src="engine/public/js/window.js" type="text/javascript"></script>
@@ -23,6 +23,7 @@
 		global.sct = false;
 		global.scf = false;
 		$(document).ready(function() {
+			$('#tweet-send').css('overflow', 'hidden').autogrow()
 			window.reply=false;
 			$("#tweet-send").bind('keydown', 'ctrl+return', function() {
 				tryToPost("tweet-send-button");
@@ -135,7 +136,7 @@
 		<script type="text/javascript">initStream();</script>
 		<script>
 			var limit = 140;
-			var txt =  $('input[id$=tweet-send]');
+			var txt =  $('textarea[id$=tweet-send]');
 			$('#char-left').text(limit);
 			$(txt).keypress(function() {
 				var len = $(this).val().length;

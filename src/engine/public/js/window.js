@@ -60,7 +60,7 @@ function checkCommand() {
 }
 
 function resetCharLimit() {
-	var txt =  $('input[id$=tweet-send]');
+	var txt =  $('textarea[id$=tweet-send]');
 	$('#char-left').text(140);
 	$('#tweet-send').val("");
 	$('#tweet-send').focus();
