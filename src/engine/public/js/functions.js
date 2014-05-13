@@ -37,7 +37,7 @@ function writeToConfig(array, file) {
 	var fs = require('fs');
 	var path = require('path');
 	var appdata = path.resolve(process.cwd(), window.config_dir);
-	var base_dir = appdata+"/RDashINC/Twimber";
+	var base_dir = window.base_dir;
 	
 	var exists = fs.existsSync(appdata+"/RDashINC");
 	if (exists === false) { fs.mkdir(path.resolve(process.cwd(), window.config_dir+"/RDashINC")); }

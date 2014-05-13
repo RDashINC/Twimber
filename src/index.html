@@ -135,9 +135,9 @@
 		</script>
 		<script type="text/javascript">initStream();</script>
 		<script>
-			var limit = 140;
+			var limit = 138;
 			var txt =  $('textarea[id$=tweet-send]');
-			$('#char-left').text(limit);
+			$('#char-left').text(140);
 			$(txt).keypress(function() {
 				var len = $(this).val().length;
 				if (len > limit) {

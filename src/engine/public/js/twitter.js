@@ -10,6 +10,16 @@ function initStream() {
 	var Twit = require('twitter');
 	var T = new Twit(window.config);
 	
+	if(typeof(global.user_stream_started)==='undefined') {
+		try {
+			var T = new Twit(window.config);
+			global.user_stream = T.stream('user');
+		} catch(err) {
+			return true;
+		}
+	} else {
+		global.user_stream.stop();
+	}
 	/** Check Creds **/
 	T.get('account/verify_credentials', function(err, data, response) {
 		if(err) {
@@ -36,13 +46,20 @@ function initStream() {
 			}
 		});
 		data = "";
-		if(typeof(global.user_stream)==='undefined') {
+		if(typeof(global.user_stream_started)==='undefined') {
+			global.user_stream_started = true;
 			console.log("[twitter] Initial stream started");
+			reload(false);
 		} else {
 			console.log("[twitter] Old Stream Found, trying to kill");
-			global.user_stream.stop();
+			global.user_stream.stopStallAbortTimeout();
+			global.user_stream.removeAllListeners();
+			global.user_stream.request.res._dump();
+			global.user_stream.request.socket.destroy();
+			global.user_stream.request.abort();
+			delete global.user_stream.request;
+			reload(true);
 		}
-		reload();
 		setInterval(function(){
 			console.log("[twitter] (): Updating tweet times <3");
 			$('.timestamp').each(function(i, obj) {
@@ -70,9 +87,12 @@ function postStatus(status) {
 
 function logout() {
 	/** Anything Logout based goes here **/
-	var Twit = require('twitter');
-	var T = new Twit(window.config);
-	global.user_stream.stop();
+	global.user_stream.stopStallAbortTimeout();
+	global.user_stream.removeAllListeners();
+	global.user_stream.request.res._dump();
+	global.user_stream.request.socket.destroy();
+	global.user_stream.request.abort();
+	delete global.user_stream.request;
 	window.location.replace("login.html#users");
 }
 
@@ -133,12 +153,17 @@ function requestPin(user) {
 }
 
 
-function reload() {
+function reload(doReconnect) {
 	console.log("[twitter] reload: Attempting to reload.");
-	var Twit = require('twitter');
-	var T = new Twit(window.config);
-
-	global.user_stream = T.stream('user');	
+	
+	if(doReconnect === true) {
+		window.alert("Was told to restart the stream");
+		console.log("[twitter] /stream/ => reload: Start stream again.");
+		var T = new Twit(window.config);
+		delete global.user_stream;
+		global.user_stream = T.stream('user');
+	}
+	
 	global.user_stream.on('tweet', function (tweet) {
 		console.log("[twitter]: /stream/ => reload: Stream updating.");
 		console.log(tweet);
@@ -147,6 +172,14 @@ function reload() {
 			obj.innerHTML = relative_time(obj.title);
 		});
 		createFormattedTweet(tweet);
+	});
+	global.user_stream.on('disconnect', function(dc_msg) {
+		parseTwitterError({ message: "You've been disconnected from the stream! :(" });
+		global.user_stream.stop();
+	});
+	global.user_stream.on('close', function(dc_msg) {
+		parseTwitterError({ message: "You've been disconnected from the stream! :(" });
+		global.user_stream.stop();
 	});
 }
 
