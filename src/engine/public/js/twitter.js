@@ -275,23 +275,27 @@ function createFormattedTweet(tweet, ap, first) {
 	}
 	created = relative_time(created);
 	
-	var final_text = "<div class='tweet item'>";
-	var final_text = final_text+"	<img style='float:left;padding:0 1ex 1ex 0; margin-bottom:5px;' src='"+profile_image_url+"'>";
-	var final_text = final_text+"	<a class='from_user' href='http://twitter.com/"+screenname+"'>["+name+"] @"+screenname+"</a>";
-	var final_text = final_text+processTweetLinks("	<p id='tweet-text' class='contents'> "+text+" </p>");
-	var final_text = final_text+"	<span title='"+created_orig+"' class='timestamp'>"+created+"</span> - ";
+	var final_text = "<div class='media item'>";
+	var final_text = final_text+"	<a class='pull-left' href='#'>";
+	var final_text = final_text+"		<img class='media-object' src='"+profile_image_url+"'>";
+	var final_text = final_text+"	</a>";
+	var final_text = final_text+"	<div class='media-body'>";
+	var final_text = final_text+"		<a class='media-heading' href='http://twitter.com/"+screenname+"'>["+name+"] @"+screenname+"</a>";
+	var final_text = final_text+processTweetLinks("		<p id='tweet-text' class='contents'> "+text+" </p>");
+	var final_text = final_text+"		<span title='"+created_orig+"' class='timestamp'>"+created+"</span> - ";
 	if(favorited === true) {
-		var final_text = final_text+"	<a id='"+id+"-fav' class='favourited' href='#'><i class='fa fa-heart' style='color:red;'></i></a>&nbsp;";
+		var final_text = final_text+"		<a id='"+id+"-fav' class='favourited' href='#'><i class='fa fa-heart' style='color:red;'></i></a>&nbsp;";
 	} else {
-		var final_text = final_text+"	<a id='"+id+"-fav' class='favourite' href='#id="+id+"&action=fav'><i class='fa fa-heart-o'></i></a>&nbsp;";
+		var final_text = final_text+"		<a id='"+id+"-fav' class='favourite' href='#id="+id+"&action=fav'><i class='fa fa-heart-o'></i></a>&nbsp;";
 	}
 	if(retweeted === true) {
-		var final_text = final_text+"	<a id='"+id+"-rt' class='retweeted' href='#'><i class='fa fa-retweet'></i>'d</a>&nbsp;";
+		var final_text = final_text+"		<a id='"+id+"-rt' class='retweeted' href='#'><i class='fa fa-retweet'></i>'d</a>&nbsp;";
 	} else {
-		var final_text = final_text+"	<a id='"+id+"-rt' class='retweet' href='#id="+id+"&action=rt'><i class='fa fa-retweet'></i></a>&nbsp;";
+		var final_text = final_text+"		<a id='"+id+"-rt' class='retweet' href='#id="+id+"&action=rt'><i class='fa fa-retweet'></i></a>&nbsp;";
 	}
-	var final_text = final_text+"	<a id='"+id+"-reply' class='reply' href='#id="+id+"&action=reply&un="+screenname+"'><i class='fa fa-reply'></i></a>&nbsp;–&nbsp;";
-	var final_text = final_text+"	<a class='src'>"+source+"</a>";
+	var final_text = final_text+"		<a id='"+id+"-reply' class='reply' href='#id="+id+"&action=reply&un="+screenname+"'><i class='fa fa-reply'></i></a>&nbsp;–&nbsp;";
+	var final_text = final_text+"		<a class='src'>"+source+"</a>";
+	var final_text = final_text+"	</div>";
 	var final_text = final_text+"</div>";
 	if(typeof(ap)!=='undefined') {
 		if(ap === true) {
