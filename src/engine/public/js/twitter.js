@@ -280,9 +280,10 @@ function createFormattedTweet(tweet, ap, first) {
 	var final_text = final_text+"		<img class='media-object' src='"+profile_image_url+"'>";
 	var final_text = final_text+"	</a>";
 	var final_text = final_text+"	<div class='media-body'>";
-	var final_text = final_text+"		<a class='media-heading' href='http://twitter.com/"+screenname+"'>["+name+"] @"+screenname+"</a>";
+	var final_text = final_text+"		<p class='media-heading' style='font-size:16px;margin-bottom:10px;'><span style='color:#FFF !important;'>"+name+"</span> (@"+screenname+")";
+	var final_text = final_text+"		– <span title='"+created_orig+"' class='timestamp'>"+created+"</span></p>";
 	var final_text = final_text+processTweetLinks("		<p id='tweet-text' class='contents'> "+text+" </p>");
-	var final_text = final_text+"		<span title='"+created_orig+"' class='timestamp'>"+created+"</span> - ";
+	var final_text = final_text+"<div class='pull-right'>";
 	if(favorited === true) {
 		var final_text = final_text+"		<a id='"+id+"-fav' class='favourited' href='#'><i class='fa fa-heart' style='color:red;'></i></a>&nbsp;";
 	} else {
@@ -295,6 +296,7 @@ function createFormattedTweet(tweet, ap, first) {
 	}
 	var final_text = final_text+"		<a id='"+id+"-reply' class='reply' href='#id="+id+"&action=reply&un="+screenname+"'><i class='fa fa-reply'></i></a>&nbsp;–&nbsp;";
 	var final_text = final_text+"		<a class='src'>"+source+"</a>";
+	var final_text = final_text+"	</div>";
 	var final_text = final_text+"	</div>";
 	var final_text = final_text+"</div>";
 	if(typeof(ap)!=='undefined') {

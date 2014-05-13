@@ -50,6 +50,7 @@
 			background: rgba(0,0,0,0.6);
 			padding: 15px;
 			margin-bottom: 15px;
+			border-radius: 5px;
 		}
 
 		.sidebar-box {
@@ -85,7 +86,7 @@
 		</div>
 		<div class="col-md-3">
 			<div class="item sidebar-box">
-				<div style='text-align:center' id='profile_picture'></div>
+				<div style='text-align:center' id='user_div'></div>
 				<textarea id="tweet-send" class="form-control" placeholder="Hello world."></textarea><br>
 				<button id='tweet-send-button' onclick="statusFunc()" class="btn btn-default btn-block" type="button" focus>
 				Tweet <i class="fa fa-twitter"></i></button>
@@ -168,7 +169,7 @@
 				}
 				console.log("[index.html] Load USer image resp: ");
 				console.log(data);
-				document.getElementById("profile_picture").innerHTML="<img src='"+data.profile_image_url.replace('normal', 'bigger')+"' alt='"+data.screen_name+"'><h2>"+data.name+"</h2><h3>@"+data.screen_name+"</h2>";
+				document.getElementById("user_div").innerHTML="<img src='"+data.profile_image_url.replace('normal', 'bigger')+"' alt='"+data.screen_name+"'><p class='lead'>"+data.name+"<br>(@"+data.screen_name+")</p>";
 			});
 		</script>
 	</body>
