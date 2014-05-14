@@ -231,6 +231,7 @@
 						var source=data.status.source
 					}
 					
+					/** Encrypt Config **/
 					var config = '{ "access_token": "'+accessParams.oauth_token+'", "access_token_secret": "'+accessParams.oauth_token_secret+'", "screen_name": "'+data.screen_name+'"}';
 					config = CryptoJS.AES.encrypt(config, pwd);
 					

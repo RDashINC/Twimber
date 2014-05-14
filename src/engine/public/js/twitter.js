@@ -1,7 +1,8 @@
-function getUserStream() {
-	console.log("[twitter] getUserStream: is deprecated.");
-}
-
+/**
+ * Starts inital streams
+ *
+ * @return none
+ **/
 function initStream() {
 	/**
 	 * This is essentially the beginning function. (for twitter).
@@ -39,10 +40,10 @@ function initStream() {
 		tweets.forEach(function(tweet) {
 			var num = num + 1;
 			if(num == 1) {
-				createFormattedTweet(tweet, true, true);
+				var tcrb = createFormattedTweet(tweet, true, true);
 				document.getElementsByClassName('tweet')[1].id="first_tweet";
 			} else {
-				createFormattedTweet(tweet, true);
+				var tcrb = createFormattedTweet(tweet, true);
 			}
 		});
 		data = "";
@@ -69,6 +70,11 @@ function initStream() {
 	});
 }
 
+/**
+ * Posts stand-alone status to twitter, with {string} text.
+ *
+ * @return {bool} Success/Failure.
+ **/
 function postStatus(status) {
 	console.log("[twitter] postStatus: attempting to post status '"+status+"'");
 	var Twit = require('twitter');
@@ -85,6 +91,11 @@ function postStatus(status) {
 	return true;
 }
 
+/**
+ * Logs current user out, and terminates Stream(s)
+ *
+ * @return none
+ **/
 function logout() {
 	/** Anything Logout based goes here **/
 	global.user_stream.stopStallAbortTimeout();
@@ -96,6 +107,11 @@ function logout() {
 	window.location.replace("login.html#users");
 }
 
+/**
+ * Replys to {int} id, with {string} status.
+ *
+ * @return {bool} Success/Failure
+ **/
 function doReply(id, status) {
 	console.log("[twitter] doReply: attempting to post status '"+status+"', in reply to the ID '"+id+"'");
 	var Twit = require('twitter');
@@ -110,6 +126,11 @@ function doReply(id, status) {
 	return true;
 }
 
+/**
+ * Takes {int} lastid and attempts to get 50 more tweets from the past.
+ *
+ * @return none
+ **/
 function loadMoreTweets(lastid) {
 	$( "#tweet-ctr" ).append("<img style=\"display: block;margin-left:auto;margin-right:auto;\" src=\"engine/public/img/tweet-load.gif\"></img>");
 	console.log("[twitter] loadMoreTweets: Getting more tweets from before id '"+lastid+"'");
@@ -126,7 +147,11 @@ function loadMoreTweets(lastid) {
 		});
 	});
 }
-
+/**
+ * Requests pin for {string} user, from twitter.
+ *
+ * @return none
+ **/
 function requestPin(user) {
 	console.log("[twitter] requestPin: Attempting to start an OAuth PIN Req.");
 		var options = {
@@ -152,7 +177,11 @@ function requestPin(user) {
 	console.log("[twitter] requestPin: Done");
 }
 
-
+/**
+ * Starts main user stream
+ *
+ * @return none
+ **/
 function reload(doReconnect) {
 	console.log("[twitter] reload: Attempting to reload.");
 	
@@ -183,6 +212,10 @@ function reload(doReconnect) {
 	});
 }
 
+/**
+ * Processes {text} twitter links, i.e @name #hashtag http://someurl/
+ *
+ * @return {string} Processed Text.
 function processTweetLinks(text) {
     var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;.]*[-A-Z0-9+&@#\/%=~_|])/i;
     text = text.replace(exp, "<a href='$1' target='_blank'>$1</a>");
@@ -193,6 +226,11 @@ function processTweetLinks(text) {
     return text;
 }
 
+/**
+ * Get DMs for current user
+ *
+ * @return none
+ **/
 function getDms() {
 	var Twit = require('twitter');
 	var T = new Twit(window.config);
@@ -204,6 +242,11 @@ function getDms() {
 	});
 }
 
+/**
+ * A special function adapted for geting users images from avail configs in config_dir
+ *
+ * @return none
+ **/
 function getUsersImages(div, link) {
 	var fs = require('fs');
 	var path = require('path');
@@ -228,6 +271,11 @@ function getUsersImages(div, link) {
 	});
 }
 
+/**
+ * Decrypts a {string} user's config file in {string} dir.
+ *
+ * @return {json} config, or throws error.
+ **/
 function decryptConfig(user, dir) {
 	var config = loadUser(user, dir);
 	config = CryptoJS.AES.decrypt(config, global.pwd);
@@ -239,6 +287,11 @@ function decryptConfig(user, dir) {
 	}
 }
 
+/**
+ * Looks up {string} user and returns object.
+ *
+ * @return {obj} twitter user's api callback.
+ **/
 function getTwitterUserInfo(user) {
 	var Twit = require('twitter');
 	eval(getConfigFile());
@@ -253,6 +306,11 @@ function getTwitterUserInfo(user) {
 	});
 }
 
+/**
+ * Get's main user's config file.
+ *
+ * @return {array}
+ **/
 function getMainUser() {
 	var fs = require('fs');
 	var data = fs.readFileSync(dir+"/main.json", { encoding: 'utf8' }, function(err, data) { 
@@ -261,12 +319,22 @@ function getMainUser() {
 	return JSON.parse(data);
 }
 
+/**
+ * Check if {string} user exists in config_dir
+ *
+ * @return {bool} Success/Failure
+ **/
 function userExists(user) {
 	var fs = require('fs');
 	var file_exists = fs.existsSync(base_dir+"/config."+user+".js");
 	return file_exists;
 }
 
+/**
+ * Return raw {string} user config in {string} dir.
+ *
+ * @return {string} config
+ **/
 function loadUser(user, dir) {
 	var fs = require('fs');
 	var data = fs.readFileSync(dir+"/config."+user+".js", { encoding: 'utf8' }, function(err, data) { 
@@ -275,12 +343,38 @@ function loadUser(user, dir) {
 	return data;
 }
 
+/**
+ * Set {string} user, as the main user in main.json
+ *
+ * @return none
+ **/
 function setMain(user) {
 	writeToConfig('{ "main":"'+user+'"}', "main.json");
 	console.log("[twitter] Set '"+user+"' as main user");
 }
 
+/**
+ * Processes {obj} obj, and filters out wanted/unwanted tweets
+ *
+ * @return {bool} Use/Ignore
+ **/
+function runThroughFilter(obj) {
+	if(typeof(obj)==='undefined') {
+		return true;
+	}
+	
+}
+
+/** 
+ * This can literally handle anything tweet related.
+ * Every single tweet is passed through here.
+ *
+ * @return {boolean} Success/Failure
+ **/
 function createFormattedTweet(tweet, ap, first) {
+	if(runThroughFilter(tweet) === true) {
+		return false;
+	}
 	var text = tweet.text;
 	var screenname = tweet.user.screen_name;
 	var name = tweet.user.name;
@@ -354,8 +448,15 @@ function createFormattedTweet(tweet, ap, first) {
 			elements[i].title=getHashTagDef(hashtag);
 		}
 	}
+	
+	return true;
 }
 
+/**
+ * Get relative time to a tweets post.
+ *
+ * @return {string} time
+ **/
 function relative_time(time) {
 	var tdate = time;
     var system_date = new Date(Date.parse(tdate));
@@ -386,14 +487,29 @@ var K = function () {
     };
 }();
 
+/**
+ * "Nicely" displays twitter errors.
+ *
+ * @return none
+ **/
 function parseTwitterError(err) {
 	$("#twitter_errors").prepend("<div id='error' class='alert alert-danger'>"+err.message+"</div>");
 }
 
+/**
+ * "Nicely" displays twitter success, or anything really.
+ *
+ * @return none
+ **/
 function postTwitterSuccess(message) {
 	$("#twitter_success").prepend("<div id='success' class='alert alert-success'>"+message+"</div>");
 }
 
+/**
+ * Attempts to favorite a tweet with {int} id.
+ *
+ * @return none
+ **/
 function fav(id) {
 	console.log("[twitter] fav: Attempting to fav tweet with id of '"+id+"'");
 	var Twit = require('twitter');
@@ -410,6 +526,11 @@ function fav(id) {
 	document.getElementById(id+"-fav").innerHTML="<span class='tweet favourited'><i class='fa fa-heart' style='color:red;'></i></span>";
 }
 
+/**
+ * Attempts to retweet a tweet with {int} id.
+ *
+ * @return none
+ **/
 function rt(id) {
 	console.log("[twitter] rt: Attempting to RT tweet with id of '"+id+"'");
 	var Twit = require('twitter');
@@ -426,6 +547,11 @@ function rt(id) {
 	document.getElementById(id+"-rt").innerHTML="<span class='tweet retweeted'><i class='fa fa-retweet'></i>'d</span>";
 }
 
+/**
+ * Attempts to delete a tweet with {int} id.
+ *
+ * @return none
+ **/
 function del(id) {
 	console.log("[twitter] del: Attempting to del your tweet with an id of '"+id+"'");
 	var Twit = require('twitter');
