@@ -143,7 +143,7 @@ function loadMoreTweets(lastid) {
 		var tweets = data;
 		document.getElementById("tweet-ctr").innerHTML="";
 		tweets.forEach(function(tweet) {
-			createFormattedTweet(tweet, true);
+			var returns = createFormattedTweet(tweet, true);
 		});
 	});
 }
@@ -186,7 +186,7 @@ function reload(doReconnect) {
 	console.log("[twitter] reload: Attempting to reload.");
 	
 	if(doReconnect === true) {
-		window.alert("Was told to restart the stream");
+		console.log("Was told to restart the stream");
 		console.log("[twitter] /stream/ => reload: Start stream again.");
 		var T = new Twit(window.config);
 		delete global.user_stream;
@@ -200,7 +200,7 @@ function reload(doReconnect) {
 		$('.timestamp').each(function(i, obj) {
 			obj.innerHTML = relative_time(obj.title);
 		});
-		createFormattedTweet(tweet);
+		var returns = createFormattedTweet(tweet);
 	});
 	global.user_stream.on('disconnect', function(dc_msg) {
 		parseTwitterError({ message: "You've been disconnected from the stream! :(" });
@@ -216,6 +216,7 @@ function reload(doReconnect) {
  * Processes {text} twitter links, i.e @name #hashtag http://someurl/
  *
  * @return {string} Processed Text.
+ **/
 function processTweetLinks(text) {
     var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;.]*[-A-Z0-9+&@#\/%=~_|])/i;
     text = text.replace(exp, "<a href='$1' target='_blank'>$1</a>");
@@ -359,10 +360,29 @@ function setMain(user) {
  * @return {bool} Use/Ignore
  **/
 function runThroughFilter(obj) {
+	var at_names = [ "Pinachuu69" ]
+	var hashs = ["#yolo", "#wcw"]
 	if(typeof(obj)==='undefined') {
 		return true;
 	}
-	
+	var text = obj.text;
+	var tagslistarr = text.split(' ');
+	var hashtags=[];
+	$.each(tagslistarr,function(i,val){
+	    if(tagslistarr[i].indexOf('#') == 0){
+	      hashtags.push(tagslistarr[i]);  
+	    }
+	});
+	var ignore = hashtags.forEach(function(entry) {
+		var ig = $.inArray(entry, hashs);
+		console.log(entry+" = "+hashs)
+		if(ig >= 0 ) { return true; }
+	});
+	if(ignore === true ) { return true; }
+	var ignore = $.inArray(obj.user.screen_name, at_names);
+	if(ignore >= 0 ) { return true; }
+
+	return false;
 }
 
 /** 
@@ -373,6 +393,7 @@ function runThroughFilter(obj) {
  **/
 function createFormattedTweet(tweet, ap, first) {
 	if(runThroughFilter(tweet) === true) {
+		console.log("Was told to filter tweet.")
 		return false;
 	}
 	var text = tweet.text;

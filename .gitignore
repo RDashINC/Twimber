@@ -1,4 +1,5 @@
 Thumbs.db
 bin/**
+b-nw/**
 make.bat
 src/engine/public/js/config.js
