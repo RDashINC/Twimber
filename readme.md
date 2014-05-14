@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/RDashINC/Twimber.svg?branch=master)](https://travis-ci.org/RDashINC/Twimber)
 Twimber
 =========
 
