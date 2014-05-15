@@ -82,11 +82,11 @@ function postStatus(status) {
 	T.post('statuses/update', { status: status }, function(err, data, response) {
 		if(err) {
 			parseTwitterError(err);
+		} else {
+			postTwitterSuccess("Tweet: Posted Successfully!");
 		}
 		console.log("[twitter] postStatus: Response "+data);
 	});
-	
-	postTwitterSuccess("Tweet: Posted Successfully!");
 	
 	return true;
 }
@@ -429,7 +429,7 @@ function createFormattedTweet(tweet, ap, first) {
 	var final_text = final_text+"		<img class='media-object' src='"+profile_image_url+"'>";
 	var final_text = final_text+"	</a>";
 	var final_text = final_text+"	<div class='media-body'>";
-	var final_text = final_text+"		<p class='media-heading' style='font-size:16px;margin-bottom:10px;'><span style='color:#FFF !important;'>"+name+"</span> (@"+screenname+")";
+	var final_text = final_text+"		<p class='media-heading' style='font-size:16px;margin-bottom:10px;'><span style='color:#FFF !important;'>"+name+"</span> (@"+processTweetLinks(screenname)+")";
 	var final_text = final_text+"		– <span title='"+created_orig+" - "+id+"' class='timestamp'>"+created+"</span></p>";
 	var final_text = final_text+processTweetLinks("		<p id='tweet-text' class='contents'> "+text+" </p>");
 	var final_text = final_text+"<div class='pull-right'>";
@@ -573,6 +573,36 @@ function rt(id) {
 	document.getElementById(id+"-rt").value="";
 	document.getElementById(id+"-rc").innerHTML=Math.floor(parseInt(document.getElementById(id+"-rc").innerHTML)+1);
 	document.getElementById(id+"-rt").innerHTML="<span class='tweet retweeted'><i class='fa fa-retweet' style='color:green;'></i></span>";
+}
+
+function postStatusWithMedia(status, file) {
+	var fs = require('fs');
+	var request = require('request');
+	var FormData = require('form-data');
+
+	var form = new FormData();
+	form.append('status', status)
+	form.append('media[]', fs.createReadStream(file));
+
+	// Twitter OAuth
+	form.getLength(function(err, length){
+		if (err) {
+    		return requestCallback(err);
+  		}
+		var oauth = { 
+		    	consumer_key: window.config.consumer_key,
+		    	consumer_secret: window.config.consumer_secret,
+		    	token: window.config.access_token,
+		    	token_secret: window.config.access_token_secret
+		};
+		var r = request.post({url:"https://api.twitter.com/1.1/statuses/update_with_media.json", oauth:oauth, host: "api.twitter.com", protocol: "https:"}, requestCallback);
+		r._form = form;
+		r.setHeader('content-length', length);
+	});
+
+	function requestCallback(err, res, body) {
+  		console.log(body);
+	}
 }
 
 /**
