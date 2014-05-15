@@ -25,10 +25,9 @@ Twimber uses a number of open source projects to work properly:
 
 * [Twitter Bootstrap] - great UI boilerplate for modern web apps
 * [jQuery] - duh
-* [HTML5] - Because it's better than HTML4
 * [node.js] - Only thing that would honestly work.
-* [Javascript] - this is an easy one.
 * [node-webkit] - Creating Simple node.js applications.
+* [FontAwesome] - An epic icon thing that really adds to the expirence.
 
 Using Source
 -----------
