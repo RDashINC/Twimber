@@ -418,6 +418,7 @@ function createFormattedTweet(tweet, ap, first) {
 		profile_image_url = tweet.retweeted_status.user.profile_image_url;
 		created = tweet.retweeted_status.created_at;
 		created_orig = created;
+		text = text.replace(/RT\s*@\S+/g, '');
 		retweeted = tweet.retweeted;
 	}
 	created = relative_time(created);
