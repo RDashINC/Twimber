@@ -1,21 +1,33 @@
 function getHashTagDef(hashtag) {
-	if(typeof(window.hashtag)==='undefined') {
-		window.hashtag = new Object;
+	if(global.hashtag_db_loaded === false) {
+		var hashtag_db = loadSavedFile('hashtags.json');
+		if(hashtag_db !== false) {
+			console.log('[functions] Loaded Hashtag definition database.');
+			global.hashtag = new Object();
+			global.hashtag = JSON.parse(hashtag_db);
+			global.hashtag_db_loaded= true;
+		}
+	}
+	if(typeof(global.hashtag)==='undefined') {
+		console.log('[functions] Starting new hashtag object.')
+		global.hashtag = new Object;
 	}
 	console.log("[functions] getHashTagDef: "+hashtag);
 	var a = hashtag;
-	if(typeof(window.hashtag[a])==='undefined') {
+	if(typeof(global.hashtag[a])==='undefined') {
 		var resp = ajax('http://api.tagdef.com/one.'+hashtag+'.json?lang=en', 'GET');
 		console.log('[functions] getHashTagDef: Got---: '+resp);
 		var resp_parse = JSON.parse(resp);
 		var text = resp_parse.defs.def.text;
 		if(typeof(text)==="undefined") {
 			var text = "Definition not available.";
-		}
-		window.hashtag[a] = text;
+		}	
+		global.hashtag[a] = text;
+		var toWrite = JSON.stringify(global.hashtag);
+		writeToConfig(toWrite, "hashtags.json");
 	} else {
-		console.log("[twitter] getHashTagDef: Using cached hashtag def.");
-		var text = window.hashtag[a];
+		console.log("[functions] getHashTagDef: Using cached hashtag def.");
+		var text = global.hashtag[a];
 	}
 	return text;
 }
@@ -48,6 +60,20 @@ function writeToConfig(array, file) {
 	var error = fs.writeFileSync(base_dir+"/"+file, array, { encoding: "utf8" });
 	if(error) throw error;
 	console.log("The configuration has been successfully written.");
+}
+
+/**
+ * Loads a file in the config_dir
+ *
+ * @return {string} file contents
+ **/
+function loadSavedFile(file) {
+	var fs = require('fs');
+	var exists = fs.existsSync(window.base_dir+"/"+file);
+	if (exists === false) { return false };
+	var file_contents = fs.readFileSync(window.base_dir+"/"+file, { encoding: 'utf8' });
+	
+	return file_contents;
 }
 
 function getConfigFile() {

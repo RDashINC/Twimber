@@ -16,6 +16,11 @@
     <link href="engine/public/css/cover.css" rel="stylesheet">
 	
 	<script type="text/javascript">
+		if(typeof(global.config_tmp)==='undefined') {
+			// Notthiinngg
+		} else {
+			window.config = global.config_tmp;
+		}
 		function doLogin() {
 			var user = document.getElementById("login-username").value;
 			doLoadThing("login-button");

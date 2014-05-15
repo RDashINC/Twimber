@@ -373,10 +373,10 @@ function runThroughFilter(obj) {
 	      hashtags.push(tagslistarr[i]);  
 	    }
 	});
-	var ignore = hashtags.forEach(function(entry) {
+	hashtags.forEach(function(entry) {
 		var ig = $.inArray(entry, hashs);
 		console.log(entry+" = "+hashs)
-		if(ig >= 0 ) { return true; }
+		if(ig >= 0 ) { var ignore = true; }
 	});
 	if(ignore === true ) { return true; }
 	var ignore = $.inArray(obj.user.screen_name, at_names);
@@ -393,7 +393,7 @@ function runThroughFilter(obj) {
  **/
 function createFormattedTweet(tweet, ap, first) {
 	if(runThroughFilter(tweet) === true) {
-		console.log("Was told to filter tweet.")
+		console.log("[twitter] createFormattedTweet: Was told to filter tweet.")
 		return false;
 	}
 	var text = tweet.text;
@@ -407,7 +407,6 @@ function createFormattedTweet(tweet, ap, first) {
 	var created_orig = created;
 	var retweeted = tweet.retweeted;
 	var favorited = tweet.favorited;
-	console.log(favorited);
 	if(typeof(tweet.retweeted_status)==='undefined') {
 		var retweeted_stat=false;
 	} else {
@@ -422,6 +421,7 @@ function createFormattedTweet(tweet, ap, first) {
 		retweeted = tweet.retweeted;
 	}
 	created = relative_time(created);
+	if(source == "web") { source="<a href='http://twitter.com/' target='_blank'>Web</a>" }
 	
 	var final_text = "<div class='media item'>";
 	var final_text = final_text+"	<a class='pull-left' href='#'>";
@@ -429,21 +429,25 @@ function createFormattedTweet(tweet, ap, first) {
 	var final_text = final_text+"	</a>";
 	var final_text = final_text+"	<div class='media-body'>";
 	var final_text = final_text+"		<p class='media-heading' style='font-size:16px;margin-bottom:10px;'><span style='color:#FFF !important;'>"+name+"</span> (@"+screenname+")";
-	var final_text = final_text+"		– <span title='"+created_orig+"' class='timestamp'>"+created+"</span></p>";
+	var final_text = final_text+"		– <span title='"+created_orig+" - "+id+"' class='timestamp'>"+created+"</span></p>";
 	var final_text = final_text+processTweetLinks("		<p id='tweet-text' class='contents'> "+text+" </p>");
 	var final_text = final_text+"<div class='pull-right'>";
 	if(favorited === true) {
-		var final_text = final_text+"		<a id='"+id+"-fav' class='favourited' href='#'><i class='fa fa-heart' style='color:red;'></i></a>&nbsp;";
+		var final_text = final_text+"		<a id='"+id+"-fav' class='favourited' href='#'><i class='fa fa-heart' style='color:red;'></i></a>&nbsp;<span id='"+id+"-fc'>"+tweet.favorite_count+"</span>&nbsp;";
 	} else {
-		var final_text = final_text+"		<a id='"+id+"-fav' class='favourite' href='#id="+id+"&action=fav'><i class='fa fa-heart-o'></i></a>&nbsp;";
+		var final_text = final_text+"		<a id='"+id+"-fav' class='favourite' href='#id="+id+"&action=fav'><i class='fa fa-heart-o'></i></a>&nbsp;<span id='"+id+"-fc'>"+tweet.favorite_count+"</span>&nbsp;";
 	}
 	if(retweeted === true) {
-		var final_text = final_text+"		<a id='"+id+"-rt' class='retweeted' href='#'><i class='fa fa-retweet'></i>'d</a>&nbsp;";
+		var final_text = final_text+"		<a id='"+id+"-rt' class='retweeted' href='#'><i class='fa fa-retweet' style='color:green'></i></a>&nbsp;<span id='"+id+"-rc'>"+tweet.retweet_count+"</span>&nbsp;";
 	} else {
-		var final_text = final_text+"		<a id='"+id+"-rt' class='retweet' href='#id="+id+"&action=rt'><i class='fa fa-retweet'></i></a>&nbsp;";
+		var final_text = final_text+"		<a id='"+id+"-rt' class='retweet' href='#id="+id+"&action=rt'><i class='fa fa-retweet'></i></a>&nbsp;<span id='"+id+"-rc'>"+tweet.retweet_count+"</span>&nbsp;";
 	}
 	var final_text = final_text+"		<a id='"+id+"-reply' class='reply' href='#id="+id+"&action=reply&un="+screenname+"'><i class='fa fa-reply'></i></a>&nbsp;–&nbsp;";
 	var final_text = final_text+"		<a class='src'>"+source+"</a>";
+	if(retweeted_stat === true) {
+		console.log(tweet);
+		var final_text = final_text+"		<span> / Retweeted by: "+processTweetLinks('@'+tweet.user.screen_name)+"</span>";
+	}
 	var final_text = final_text+"	</div>";
 	var final_text = final_text+"	</div>";
 	var final_text = final_text+"</div>";
@@ -514,7 +518,7 @@ var K = function () {
  * @return none
  **/
 function parseTwitterError(err) {
-	$("#twitter_errors").prepend("<div id='error' class='alert alert-danger'>"+err.message+"</div>");
+	$("#twitter_errors").prepend("<div id='error' class='alert alert-danger'>Twitter Reported an Error: "+err.message+"</div>");
 }
 
 /**
@@ -544,6 +548,7 @@ function fav(id) {
 		console.log(data);
 	});
 	document.getElementById(id+"-fav").value="";
+	document.getElementById(id+"-fc").innerHTML=Math.floor(parseInt(document.getElementById(id+"-fc").innerHTML)+1);
 	document.getElementById(id+"-fav").innerHTML="<span class='tweet favourited'><i class='fa fa-heart' style='color:red;'></i></span>";
 }
 
@@ -565,7 +570,8 @@ function rt(id) {
 		console.log(data);
 	});
 	document.getElementById(id+"-rt").value="";
-	document.getElementById(id+"-rt").innerHTML="<span class='tweet retweeted'><i class='fa fa-retweet'></i>'d</span>";
+	document.getElementById(id+"-rc").innerHTML=Math.floor(parseInt(document.getElementById(id+"-rc").innerHTML)+1);
+	document.getElementById(id+"-rt").innerHTML="<span class='tweet retweeted'><i class='fa fa-retweet' style='color:green;'></i></span>";
 }
 
 /**
