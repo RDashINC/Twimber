@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: twitter.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: twitter.js</h1>
+
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Starts inital streams
+ *
+ * @return none
+ **/
+function initStream() {
+	/**
+	 * This is essentially the beginning function. (for twitter).
+	**/
+	document.getElementById("tweet-ctr").innerHTML="&lt;img style=\"display: block;margin-left:auto;margin-right:auto;\" src=\"engine/public/img/ajax-loader.gif\">&lt;/img>";
+	var Twit = require('twitter');
+	var T = new Twit(window.config);
+	
+	if(typeof(global.user_stream_started)==='undefined') {
+		try {
+			global.user_stream = T.stream('user');
+		} catch(err) {
+			return true;
+		}
+	} else {
+		global.user_stream.stop();
+	}
+	/** Check Creds **/
+	T.get('account/verify_credentials', function(err, data, response) {
+		if(err) {
+			parseTwitterError(err);
+		}
+		console.log("[twitter] /initStream/ => [checkCreds]: Got a response from Twitter");
+		console.log(data);
+	});
+	
+	T.get('statuses/home_timeline', { count: "150" }, function (err, data, response) {
+		if(err) {
+			parseTwitterError(err);
+		}
+		var tweets = data;
+		var tcrb = null;
+		document.getElementById("tweet-ctr").innerHTML="";
+		var num = 0;
+		tweets.forEach(function(tweet) {
+			var num = num + 1;
+			if(num == 1) {
+				tcrb = createFormattedTweet(tweet, true, true);
+				document.getElementsByClassName('tweet')[1].id="first_tweet";
+			} else {
+				tcrb = createFormattedTweet(tweet, true);
+			}
+		});
+		data = "";
+		if(typeof(global.user_stream_started)==='undefined') {
+			global.user_stream_started = true;
+			console.log("[twitter] Initial stream started");
+			reload(false);
+		} else {
+			console.log("[twitter] Old Stream Found, trying to kill");
+			global.user_stream.stopStallAbortTimeout();
+			global.user_stream.removeAllListeners();
+			global.user_stream.request.res._dump();
+			global.user_stream.request.socket.destroy();
+			global.user_stream.request.abort();
+			delete global.user_stream.request;
+			reload(true);
+		}
+		setInterval(function(){
+			console.log("[twitter] (): Updating tweet times &lt;3");
+			$('.timestamp').each(function(i, obj) {
+				obj.innerHTML = relative_time(obj.title);
+			});
+		}, 5000);
+	});
+}
+
+/**
+ * Posts stand-alone status to twitter, with {string} text.
+ *
+ * @param {string} status - Status to send too twitter
+ * @return {bool} Success/Failure.
+ **/
+function postStatus(status) {
+	console.log("[twitter] postStatus: attempting to post status '"+status+"'");
+	var Twit = require('twitter');
+	var T = new Twit(window.config);
+	T.post('statuses/update', { status: status }, function(err, data, response) {
+		if(err) {
+			parseTwitterError(err);
+		} else {
+			postTwitterSuccess("Tweet: Posted Successfully!");
+		}
+		console.log("[twitter] postStatus: Response "+data);
+	});
+	
+	return true;
+}
+
+/**
+ * Logs current user out, and terminates Stream(s)
+ *
+ * @return none
+ **/
+function logout() {
+	/** Anything Logout based goes here **/
+	global.user_stream.stopStallAbortTimeout();
+	global.user_stream.removeAllListeners();
+	global.user_stream.request.res._dump();
+	global.user_stream.request.socket.destroy();
+	global.user_stream.request.abort();
+	delete global.user_stream.request;
+	window.location.replace("login.html#users");
+}
+
+/**
+ * Replys to {int} id, with {string} status.
+ *
+ * @param {int} id - Twitter ID to reply to.
+ * @param {string} status - Status to post to Twitter.
+ * @return {bool} Success/Failure
+ **/
+function doReply(id, status) {
+	console.log("[twitter] doReply: attempting to post status '"+status+"', in reply to the ID '"+id+"'");
+	var Twit = require('twitter');
+	var T = new Twit(window.config);
+	T.post('statuses/update', { status: status, in_reply_to_status_id: id }, function(err, data, response) {
+		if(err) {
+			parseTwitterError(err);
+		} else {
+			postTwitterSuccess("Twitter: Replied was sent Successfully!");
+		}
+		console.log("[twitter] doReply: Response "+err);
+	});
+	
+	return true;
+}
+
+/**
+ * Attempts to get 50 more tweets from the past.
+ *
+ * @param {int} lastid - Last ID of tweet to attempt to get 50 more from.
+ * @return none
+ **/
+function loadMoreTweets(lastid) {
+	$( "#tweet-ctr" ).append("&lt;img style=\"display: block;margin-left:auto;margin-right:auto;\" src=\"engine/public/img/tweet-load.gif\">&lt;/img>");
+	console.log("[twitter] loadMoreTweets: Getting more tweets from before id '"+lastid+"'");
+	var Twit = require('twitter');
+	var T = new Twit(window.config);
+	T.get('statuses/home_timeline', { count: "50", max_id: lastid  }, function (err, data, response) {
+		if(err) {
+			parseTwitterError(err);
+		}
+		var tweets = data;
+		document.getElementById("tweet-ctr").innerHTML="";
+		tweets.forEach(function(tweet) {
+			var returns = createFormattedTweet(tweet, true);
+		});
+	});
+}
+/**
+ * Requests pin from Twitter.
+ *
+ * @param {string} user - Username to fill in Twitter Username feild.
+ * @return none
+ **/
+function requestPin(user) {
+	console.log("[twitter] requestPin: Attempting to start an OAuth PIN Req.");
+		var options = {
+			consumerKey: window.config.consumer_key,
+			consumerSecret: window.config.consumer_secret
+		};
+		var requestParams;
+		var accessParams;
+ 
+		var oauth = OAuth(options);
+ 
+		oauth.get('https://twitter.com/oauth/request_token',
+ 
+			function(data) {
+				console.dir(data);
+				window.open('https://twitter.com/oauth/authorize?'+data.text+"&amp;screen_name="+user+"&amp;force_login=true");
+				requestParams = data.text;
+				window.location.replace('login.html#'+requestParams);
+			},
+ 
+			function(data) { alert('darn'); console.dir(data); }
+		);
+	console.log("[twitter] requestPin: Done");
+}
+
+/**
+ * Starts main user stream
+ *
+ * @param {bool} doReconnect - Restart the stream.
+ * @return none
+ **/
+function reload(doReconnect) {
+	console.log("[twitter] reload: Attempting to reload.");
+	
+	if(doReconnect === true) {
+		console.log("Was told to restart the stream");
+		console.log("[twitter] /stream/ => reload: Start stream again.");
+		var T = new Twit(window.config);
+		delete global.user_stream;
+		global.user_stream = T.stream('user');
+	}
+	
+	global.user_stream.on('tweet', function (tweet) {
+		console.log("[twitter]: /stream/ => reload: Stream updating.");
+		console.log(tweet);
+		console.log("[twitter] /stream/ => reload: Updating old tweets time.");
+		$('.timestamp').each(function(i, obj) {
+			obj.innerHTML = relative_time(obj.title);
+		});
+		var returns = createFormattedTweet(tweet);
+	});
+	global.user_stream.on('disconnect', function(dc_msg) {
+		parseTwitterError({ message: "You've been disconnected from the stream! :(" });
+		global.user_stream.stop();
+	});
+	global.user_stream.on('favorite', function(response) {
+		console.log("[twitter] /stream/ => reload: Got a favorite");
+		console.log(response);
+		console.log("[twitter] /stream/ => reload: User '"+response.source.screen_name+"' favorited tweet with ID '"+response.target.id+"'");
+		createNotificationTweet(response);
+	});
+	global.user_stream.on('close', function(dc_msg) {
+		parseTwitterError({ message: "You've been disconnected from the stream! :(" });
+		global.user_stream.stop();
+	});
+}
+
+/**
+ * Processes Twitter links, along with regular ones.
+ *
+ * @param {string} text - Text to process.
+ * @return {string} Processed Text.
+ **/
+function processTweetLinks(text) {
+	if(typeof(text)==='undefined') {
+		// Fallback to original text.
+		return "&lt;span style='color:red'>[Twimber Error] empty text&lt;/span>";
+	}
+	var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&amp;@#\/%?=~_|!:,.;.]*[-A-Z0-9+&amp;@#\/%=~_|])/i;
+	text = text.replace(exp, "&lt;a href='$1' target='_blank'>$1&lt;/a>");
+	exp = /(^|\s)#(\w+)/g;
+	text = text.replace(exp, "$1&lt;a href='http://search.twitter.com/search?q=%23$2' target='_blank' class='tweet hashtag' id='$2'>#$2&lt;/a>");
+	exp = /(^|\s)@(\w+)/g;
+	text = text.replace(exp, "$1&lt;a href='#id=null&amp;action=lookup&amp;un=$2'>@$2&lt;/a>");
+	return text;
+}
+
+/**
+ * Get DMs for current user
+ *
+ * @return none
+ **/
+function getDms() {
+	var Twit = require('twitter');
+	var T = new Twit(window.config);
+	T.get('direct_messages', { count: "200"}, function (err, data, response) {
+		if(err) {
+			parseTwitterError(err);
+		}
+		console.log(data);
+	});
+}
+
+/**
+ * A special function adapted for geting users images from avail configs in config_dir
+ *
+ * @param {string} div - Div to place images in
+ * @param {string} link - I totally forgot.
+ * @return none
+ **/
+function getUsersImages(div, link) {
+	var fs = require('fs');
+	var path = require('path');
+	/* jshint ignore:start */
+	eval(getConfigFile());
+	/* jshint ignore:end */
+	var Twit = require('twitter');
+	var T = new Twit(window.config);
+	var files = fs.readdirSync(window.base_dir);
+	global.final_text = "";
+	files.forEach(function(file) {
+		if(path.extname(file) === ".js") {
+			var user = file.split('.')[1];
+			T.get('users/show', { screen_name: user } , function(err, data, response) {
+				if(err) {
+					parseTwitterError(err);
+				}
+				var config = decryptConfig(data.screen_name, window.base_dir);
+				var profile_image = data.profile_image_url;
+				global.final_text = "&lt;img class='login_image' onclick='doLoginNoInput(\""+user+"\")' src='"+profile_image+"' alt='"+user+"'>";
+				$(div).prepend(global.final_text);
+			});
+		}
+	});
+}
+
+/**
+ * Decrypts a {string} user's config file in {string} dir.
+ *
+ * @param {string} user - Username for cfg file.
+ * @param {string} dir - DIR for passing to loadUser()
+ * @return {json} config, or throws error.
+ **/
+function decryptConfig(user, dir) {
+	var config = loadUser(user, dir);
+	config = CryptoJS.AES.decrypt(config, global.pwd);
+	config = config.toString(CryptoJS.enc.Utf8);
+	if(config) {
+		return JSON.parse(config);
+	} else {
+		throw "Failed Too Decrypt User '"+user+"' config, Wrong Password?";
+	}
+}
+
+/**
+ * Looks up {string} user and returns object.
+ *
+ * @param {string} user - User to look up.
+ * @return {obj} twitter user's api callback.
+ **/
+function getTwitterUserInfo(user) {
+	var Twit = require('twitter');
+	/* jshint ignore:start */
+	eval(getConfigFile());
+	/* jshint ignore:end */
+	var T = new Twit(window.config);
+	T.get('users/show', { screen_name: user } , function(err, data, response) {
+		if(err) {
+			parseTwitterError(err);
+		}
+		console.log("[twitter] /twitter/ => [user/show]: Looked up user: "+user);
+		console.log(data);
+		return data;
+	});
+}
+
+/**
+ * Get's main user's config file.
+ *
+ * @return {array}
+ **/
+function getMainUser() {
+	var fs = require('fs');
+	var data = fs.readFileSync(dir+"/main.json", { encoding: 'utf8' }, function(err, data) { 
+		if (err) throw err; 
+	});
+	return JSON.parse(data);
+}
+
+/**
+ * Check if {string} user exists in config_dir
+ *
+ * @param {string} user - User to see if cfg exists.
+ * @return {bool} Success/Failure
+ **/
+function userExists(user) {
+	var fs = require('fs');
+	var file_exists = fs.existsSync(base_dir+"/config."+user+".js");
+	return file_exists;
+}
+
+/**
+ * Return raw {string} user config in {string} dir.
+ *
+ * @param {string} user - Users name for cfg
+ * @param {string} dir - DIR for CFG files.
+ * @return {string} config
+ **/
+function loadUser(user, dir) {
+	var fs = require('fs');
+	var data = fs.readFileSync(dir+"/config."+user+".js", { encoding: 'utf8' }, function(err, data) { 
+		if (err) throw err; 
+	});
+	return data;
+}
+
+/**
+ * Set {string} user, as the main user in main.json
+ *
+ * @param {string} user - User to set as main.
+ * @return none
+ **/
+function setMain(user) {
+	writeToConfig('{ "main":"'+user+'"}', "main.json");
+	console.log("[twitter] Set '"+user+"' as main user");
+}
+
+/**
+ * Processes {obj} obj, and filters out wanted/unwanted tweets
+ *
+ * @param {obj} obj - Tweet object
+ * @return {bool} Use/Ignore
+ **/
+function runThroughFilter(obj) {
+	var at_names = ["Pinachuu69"];
+	var hashs = ["#yolo", "#wcw"];
+	if(typeof(obj)==='undefined') {
+		return true;
+	}
+	if(typeof(obj.text)==='undefined') {
+		// Nothing for now
+	} else {
+		var text = obj.text;
+		var tagslistarr = text.split(' ');
+		var hashtags= [];
+		$.each(tagslistarr,function(i,val){
+		    if(tagslistarr[i].indexOf('#') === 0){
+		      hashtags.push(tagslistarr[i]);  
+		    }
+		});
+
+		hashtags.forEach(function(entry) {
+			var ig = $.inArray(entry, hashs);
+			console.log(entry+" = "+hashs);
+			if(ig >= 0 ) { var ignore = true; }
+		});
+		if(ignore === true ) { return true; }
+		var ignore = $.inArray(obj.user.screen_name, at_names);
+		if(ignore >= 0 ) { return true; }
+	}
+
+	return false;
+}
+
+/**
+ * Creates a fav/rt/special type of tweet, and prepends onto div.
+ *
+ * @param {obj} tweet - Tweet object.
+ * @param {string} div - Div to prepend too.
+ * @returns none
+ **/
+function createNotificationTweet(tweet, div) {
+	if(runThroughFilter(tweet) === true) {
+		console.log("[twitter] createFormattedTweet: Was told to filter tweet.");
+		return false;
+	}
+	if(tweet.event == "favorite") {
+		tweet_favorited = true;
+		screenname = tweet.source.screenname;
+		text = tweet.target_object.text;
+		profile_image = tweet.target_object.profile_image_url;
+		protect = tweet.source.protected;
+		id = null;
+		retweeted = false;
+		favorited = tweet.source.favorited;
+		favorite_count = tweet.target_object.favorite_count;
+		retweet_count = tweet.target_object.retweet_count;
+		source = tweet.target_object.source;
+		created = tweet.created_at;
+		created_orig = created;
+		name = tweet.target.name;
+		console.log(tweet);
+		console.log("text is: "+text);
+	}
+}
+
+/** 
+ * This can literally handle anything tweet related.
+ * Every single tweet is passed through here.
+ *
+ * @param {obj} tweet - Tweet Object
+ * @param {boolean} ap - Append tweet instead of prepending it.
+ * @param {boolean} first - Designates a first tweet of the stream.
+ * @todo Make it rely on the tweet.event instead of supplied via stream, Clean-up.
+ * @return {boolean} Success/Failure
+ **/
+function createFormattedTweet(tweet, ap, first) {
+	if(runThroughFilter(tweet) === true) {
+		console.log("[twitter] createFormattedTweet: Was told to filter tweet.");
+		return false;
+	}
+	var text = tweet.text;
+	var retweet_stat = false;
+	var tweet_favorited = false;
+	var tweet_retweeted = false;
+	var screenname = tweet.user.screen_name;
+	var name = tweet.user.name;
+	var source = tweet.source;
+	var id = tweet.id_str; 
+	var profile_image_url = tweet.user.profile_image_url;
+	var protect = tweet.user.protected;
+	var created= tweet.created_at;
+	var created_orig = created;
+	var retweeted = tweet.retweeted;
+	var favorite_count = tweet.favorite_count;
+	var retweet_count = tweet.retweet_count;
+	var favorited = tweet.favorited;
+
+	if(typeof(tweet.retweeted_status)==='undefined') {
+		retweeted_stat=false;
+	} else if(tweet.retweeted_status === true) {
+		console.log("[twitter] createFormattedTweet: Got a Retweet, formatting values.");
+		retweeted_stat=true;
+		screenname = tweet.retweeted_status.user.screen_name;
+		name = tweet.retweeted_status.user.name;
+		source = tweet.retweeted_status.source;
+		profile_image_url = tweet.retweeted_status.user.profile_image_url;
+		created = tweet.retweeted_status.created_at;
+		created_orig = created;
+		text = text.replace(/RT\s*@\S+/g, '');
+		retweeted = tweet.retweeted;
+		retweet_count = tweet.retweeted_status.retweet_count;
+		favorite_count = tweet.retweeted_status.favorite_count;
+		protect = false;
+	}
+	created = relative_time(created);
+	if(source == "web") { source="&lt;a href='http://twitter.com/' target='_blank'>Web&lt;/a>"; }
+	
+	var final_text = "&lt;div class='media item "+(protect === true ? "protected" : "")+"'>";
+	final_text = final_text+"	&lt;a class='pull-left' href='#'>";
+	final_text = final_text+"		&lt;img class='media-object' src='"+profile_image_url+"'>";
+	final_text = final_text+"	&lt;/a>";
+	final_text = final_text+"	&lt;div class='media-body'>";
+	final_text = final_text+"		&lt;p class='media-heading' style='font-size:16px;margin-bottom:10px;'>&lt;span style='color:#FFF !important;'>"+name+"&lt;/span> (@"+processTweetLinks(screenname)+")"+(protect === true ? " &lt;span>&lt;i class='fa fa-lock'>&lt;/i>&lt;/span>" : "");
+	final_text = final_text+" – &lt;span title='"+created_orig+" - "+id+"' class='timestamp'>"+created+"&lt;/span>&lt;/p>";
+	final_text = final_text+"		&lt;p id='tweet-text' class='contents'> "+processTweetLinks(text)+" &lt;/p>";
+	final_text = final_text+"	&lt;/p>";
+	final_text = final_text+"&lt;div class='pull-right'>";
+	if(favorited === true) {
+		final_text = final_text+"		&lt;a id='"+id+"-fav' class='favourited' href='#'>&lt;i class='fa fa-heart' style='color:red;'>&lt;/i>&lt;/a>&amp;nbsp;&lt;span id='"+id+"-fc'>"+favorite_count+"&lt;/span>&amp;nbsp;";
+	} else {
+		final_text = final_text+"		&lt;a id='"+id+"-fav' class='favourite' href='#id="+id+"&amp;action=fav'>&lt;i class='fa fa-heart-o'>&lt;/i>&lt;/a>&amp;nbsp;&lt;span id='"+id+"-fc'>"+favorite_count+"&lt;/span>&amp;nbsp;";
+	}
+	if(retweeted === true) {
+		final_text = final_text+"		&lt;a id='"+id+"-rt' class='retweeted' href='#'>&lt;i class='fa fa-retweet' style='color:green'>&lt;/i>&lt;/a>&amp;nbsp;&lt;span id='"+id+"-rc'>"+retweet_count+"&lt;/span>&amp;nbsp;";
+	} else {
+		final_text = final_text+"		&lt;a id='"+id+"-rt' class='retweet' href='#id="+id+"&amp;action=rt'>&lt;i class='fa fa-retweet'>&lt;/i>&lt;/a>&amp;nbsp;&lt;span id='"+id+"-rc'>"+retweet_count+"&lt;/span>&amp;nbsp;";
+	}
+	final_text = final_text+"		&lt;a id='"+id+"-reply' class='reply' href='#id="+id+"&amp;action=reply&amp;un="+screenname+"'>&lt;i class='fa fa-reply'>&lt;/i>&lt;/a>&amp;nbsp;–&amp;nbsp;";
+	final_text = final_text+"		&lt;a class='src'>"+source+"&lt;/a>";
+	if(retweeted_stat === true) {
+		console.log(tweet);
+		final_text = final_text+"		&lt;span> / Retweeted by: "+processTweetLinks('@'+tweet.user.screen_name)+"&lt;/span>";
+	}
+	final_text = final_text+"	&lt;/div>";
+	final_text = final_text+"	&lt;/div>";
+	final_text = final_text+"&lt;/div>";
+	if(typeof(ap)!=='undefined') {
+		if(ap === true) {
+			$( "#tweet-ctr" ).append(final_text);
+		}
+	} else {
+		if(first === true) {
+			console.log("[twitter] createFormattedTweet: Got a first tweet");
+			$('#tweet-ctr').prepend(final_text);
+		} else {
+			$('#tweet-ctr').prepend(final_text);
+		}
+		console.log("[twitter] createFormattedTweet: prepended.");
+	}
+
+	var elements = document.getElementsByClassName('tweet hashtag');
+	for (var i = 0; i &lt; elements.length; i++) { 
+		if(elements[i].title === "") {
+			var hashtag = elements[i].innerHTML.replace( /#/, "" );
+			console.log("[twitter] createFormattedTweet: Replacing Hashtag '"+hashtag+"' with def.");
+			elements[i].title=getHashTagDef(hashtag);
+		}
+	}
+	
+	return true;
+}
+
+/**
+ * Get relative time to a tweets post.
+ *
+ * @param {string} time - Twitter formatted Time.
+ * @return {string} time
+ **/
+function relative_time(time) {
+	var tdate = time;
+    var system_date = new Date(Date.parse(tdate));
+    var user_date = new Date();
+    if (K.ie) {
+        system_date = Date.parse(tdate.replace(/( \+)/, ' UTC$1'));
+    }
+    var diff = Math.floor((user_date - system_date) / 1000);
+    if (diff &lt;= 1) {return "just now";}
+    if (diff &lt; 20) {return diff + " seconds ago";}
+    if (diff &lt; 40) {return "half a minute ago";}
+    if (diff &lt; 60) {return "less than a minute ago";}
+    if (diff &lt;= 90) {return "one minute ago";}
+    if (diff &lt;= 3540) {return Math.round(diff / 60) + " minutes ago";}
+    if (diff &lt;= 5400) {return "1 hour ago";}
+    if (diff &lt;= 86400) {return Math.round(diff / 3600) + " hours ago";}
+    if (diff &lt;= 129600) {return "1 day ago";}
+    if (diff &lt; 604800) {return Math.round(diff / 86400) + " days ago";}
+    if (diff &lt;= 777600) {return "1 week ago";}
+    return "on " + system_date;
+}
+
+// from http://widgets.twimg.com/j/1/widget.js
+var K = function () {
+    var a = navigator.userAgent;
+    return {
+        ie: a.match(/MSIE\s([^;]*)/)
+    };
+}();
+
+/**
+ * "Nicely" displays twitter errors onto client.
+ *
+ * @param {string/obj} err - Twitter err obj, or err string.
+ * @return none
+ **/
+function parseTwitterError(err) {
+	if(typeof(err.message) === 'undefined') {
+		$("#twitter_errors").prepend("&lt;div id='error' class='alert alert-danger'>An Error Occured: "+err+"&lt;/div>");
+	} else {
+		$("#twitter_errors").prepend("&lt;div id='error' class='alert alert-danger'>Twitter Reported an Error: "+err.message+"&lt;/div>");
+	}
+}
+
+/**
+ * "Nicely" displays twitter success, or anything really.
+ *
+ * @param {string} message - Success Message.
+ * @return none
+ **/
+function postTwitterSuccess(message) {
+	$("#twitter_success").prepend("&lt;div id='success' class='alert alert-success'>"+message+"&lt;/div>");
+}
+
+/**
+ * Attempts to favorite a tweet.
+ *
+ * @param {int} id - Id of tweet to favorite.
+ * @return none
+ **/
+function fav(id) {
+	console.log("[twitter] fav: Attempting to fav tweet with id of '"+id+"'");
+	var Twit = require('twitter');
+	var T = new Twit(window.config);
+	T.post('favorites/create', { id: id }, function (err, data, response) {
+		if(err) {
+			parseTwitterError(err);
+		} else {
+			postTwitterSuccess("Tweet: Favorited Successfully!");
+		}
+		console.log(data);
+	});
+	document.getElementById(id+"-fav").value="";
+	document.getElementById(id+"-fc").innerHTML=Math.floor(parseInt(document.getElementById(id+"-fc").innerHTML)+1);
+	document.getElementById(id+"-fav").innerHTML="&lt;span class='tweet favourited'>&lt;i class='fa fa-heart' style='color:red;'>&lt;/i>&lt;/span>";
+}
+
+/**
+ * Attempts to retweet a tweet.
+ *
+ * @param {int} id - Id of tweet to RT.
+ * @return none
+ **/
+function rt(id) {
+	console.log("[twitter] rt: Attempting to RT tweet with id of '"+id+"'");
+	var Twit = require('twitter');
+	var T = new Twit(window.config);
+	T.post('statuses/retweet/:id', { id: id }, function (err, data, response) {
+		if(err) {
+			parseTwitterError(err);
+		} else {
+			postTwitterSuccess("Tweet: Retweeted Successfully!");
+		}
+		console.log(data);
+	});
+	document.getElementById(id+"-rt").value="";
+	document.getElementById(id+"-rc").innerHTML=Math.floor(parseInt(document.getElementById(id+"-rc").innerHTML)+1);
+	document.getElementById(id+"-rt").innerHTML="&lt;span class='tweet retweeted'>&lt;i class='fa fa-retweet' style='color:green;'>&lt;/i>&lt;/span>";
+}
+
+/**
+ * Posts a status with an image to twitter.
+ *
+ * @param {string} status - Status to post with file.
+ * @param {string} file - Absolute path to file to upload with status.
+ * @return none
+ **/
+function postStatusWithMedia(status, file) {
+	var fs = require('fs');
+	var request = require('request');
+	var FormData = require('form-data');
+	var utf8 = require('utf8');
+
+	// Encode in UTF-8
+	status = utf8.encode(status);
+
+	// Construct a multipart/form-data request with node-form-data
+	var form = new FormData();
+	form.append('status', status);
+	form.append('media[]', fs.createReadStream(file));
+
+	// Twitter OAuth
+	form.getLength(function(err, length){
+		if (err) {
+    		return requestCallback(err);
+  		}
+		var oauth = { 
+		    	consumer_key: window.config.consumer_key,
+		    	consumer_secret: window.config.consumer_secret,
+		    	token: window.config.access_token,
+		    	token_secret: window.config.access_token_secret
+		};
+		var r = request.post({url:"https://api.twitter.com/1.1/statuses/update_with_media.json", oauth:oauth, host: "api.twitter.com", protocol: "https:"}, requestCallback);
+		r._form = form;
+		r.setHeader('content-length', length);
+	});
+
+	function requestCallback(err, res, body) {
+  		if(err) {
+  			parseTwitterError(err);
+  		} else {
+  			postTwitterSuccess("Tweet and Image posted Successfully!");
+  		}
+	}
+}
+
+/**
+ * Attempts to delete a tweet.
+ *
+ * @param {int} id - Id of tweet to delete.
+ * @return none
+ **/
+function del(id) {
+	console.log("[twitter] del: Attempting to del your tweet with an id of '"+id+"'");
+	var Twit = require('twitter');
+	var T = new Twit(window.config);
+	T.post('statuses/delete/:id', { id: id }, function (err, data, response) {
+		if(err) {
+			parseTwitterError(err);
+		} else {
+			postTwitterSuccess("Tweet: Deleted Successfully!");
+		}
+		console.log(data);
+	});
+}
+
+var twit_ver="1.2.1-dev";
+console.log("[twitter] Loaded Version: "+twit_ver);</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Global</h3><ul><li><a href="global.html#createFormattedTweet">createFormattedTweet</a></li><li><a href="global.html#createNotificationTweet">createNotificationTweet</a></li><li><a href="global.html#decryptConfig">decryptConfig</a></li><li><a href="global.html#del">del</a></li><li><a href="global.html#doReply">doReply</a></li><li><a href="global.html#fav">fav</a></li><li><a href="global.html#getDms">getDms</a></li><li><a href="global.html#getMainUser">getMainUser</a></li><li><a href="global.html#getTwitterUserInfo">getTwitterUserInfo</a></li><li><a href="global.html#getUsersImages">getUsersImages</a></li><li><a href="global.html#initStream">initStream</a></li><li><a href="global.html#loadMoreTweets">loadMoreTweets</a></li><li><a href="global.html#loadUser">loadUser</a></li><li><a href="global.html#logout">logout</a></li><li><a href="global.html#parseTwitterError">parseTwitterError</a></li><li><a href="global.html#postStatus">postStatus</a></li><li><a href="global.html#postStatusWithMedia">postStatusWithMedia</a></li><li><a href="global.html#postTwitterSuccess">postTwitterSuccess</a></li><li><a href="global.html#processTweetLinks">processTweetLinks</a></li><li><a href="global.html#relative_time">relative_time</a></li><li><a href="global.html#reload">reload</a></li><li><a href="global.html#requestPin">requestPin</a></li><li><a href="global.html#rt">rt</a></li><li><a href="global.html#runThroughFilter">runThroughFilter</a></li><li><a href="global.html#setMain">setMain</a></li><li><a href="global.html#userExists">userExists</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Sat May 17 2014 22:46:53 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
