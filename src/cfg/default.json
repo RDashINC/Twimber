@@ -1,0 +1,30 @@
+{
+	"name": "",
+	"desc": "",
+	"profile_image_url": "",
+	"workspace": "default",
+	"workspaces": {
+		"0": {
+			"name": "default",
+			"tabs": {
+				"1": {
+					"type":"home",
+					"name":"2root4you"
+				},
+				"2": {
+					"type":"dm"
+				},
+				"3": {
+					"type":"user",
+					"name": "2root4you"
+				}
+			}
+		}
+	},
+	"credentials": {
+		"2root4you": {
+			"auth_token": "",
+			"auth_token_secret": ""
+		}
+	}
+}

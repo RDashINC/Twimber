@@ -1,0 +1,281 @@
+<!DOCTYPE HTML>
+<!--
+	Aerial by HTML5 UP
+	html5up.net | @n33co
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+
+	Thank you @n33co for the amazingness you have created <3
+-->
+<html>
+	<head>
+		<title>Twimber v2</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<!--[if lte IE 8]><script src="css/ie/html5shiv.js"></script><![endif]-->
+		
+		<!-- Allow bootstrap override, place after -->
+		<link rel="stylesheet" href="css/bootstrap.min.css" />
+		<script src="js/jquery-2.0.3.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+
+		<!-- JQuery and OAuth, and Twitter -->
+		<script src="js/jquery.backstretch.min.js"></script>
+		<script src="js/jsOAuth-1.1.min.js"></script>
+		<script src="js/twitter.js"></script>
+
+		<!-- HTML5UP related stuff -->
+		<script src="js/skel.min.js"></script>
+		<script src="js/init.js"></script>
+		<noscript>
+			<link rel="stylesheet" href="css/skel.css" />
+			<link rel="stylesheet" href="css/style.css" />
+			<link rel="stylesheet" href="css/style-wide.css" />
+			<link rel="stylesheet" href="css/style-noscript.css" />
+		</noscript>
+
+		<!-- Index API -->
+		<script type="text/javascript">
+			var index = new Object();
+			index.throwError = function(err) {
+				$("#notification").html("<h2>An Error Occured</h2><p>"+err+"</p>");
+				$(".progress-bar").attr("style", "width:100%;");
+				$(".pin-wrapper").hide();
+				$(".login-wrapper").hide();
+				$("#btn-return").show();
+			}
+			index.isDone = function() {
+				// Create slide effect.
+				$(".well-top").slideUp("fast");
+				$("#logging_in").slideDown("fast");
+
+				// Display normal user thing
+				$("#notification").html("<img class='profile-img' src='"+tlib.user.profile_image_url+"'/><p>Welcome, @<a style='color:#FFFFFF;' class='no-color-a-fix' href='http://twitter.com/"+tlib.user.screen_name+"'>"+tlib.user.screen_name+"</a>!</p>");
+				$(".progress-bar").attr("style", "width:100%;");
+				$(".pin-wrapper").hide();
+				$(".login-wrapper").hide();
+				$(".progress").hide();
+				$("#btn-return").removeClass("btn-danger");
+				$("#btn-return").addClass("btn btn-success");
+				$("#btn-return").html("Onward!");
+				$("#btn-return").attr("onclick", "window.location = \"frontend.html\"");
+				$("#btn-return").show();
+			}
+
+			// Page Reset
+			function isIE()
+			{
+			  var rv = -1;
+			  if (navigator.appName == 'Microsoft Internet Explorer')
+			  {
+			    var ua = navigator.userAgent;
+			    var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+			    if (re.exec(ua) != null)
+			      rv = parseFloat( RegExp.$1 );
+			  }
+			  else if (navigator.appName == 'Netscape')
+			  {
+			    var ua = navigator.userAgent;
+			    var re  = new RegExp("Trident/.*rv:([0-9]{1,}[\.0-9]{0,})");
+			    if (re.exec(ua) != null)
+			      rv = parseFloat( RegExp.$1 );
+			  }
+			  return rv == -1 ? false: true;
+			}
+
+			$(window).on('load', function() {
+				resetInput();
+				
+				if(isIE()){
+					triggerIE();
+				} 
+			});
+		</script>
+	</head>
+	<style>
+		.form-control {
+			margin-bottom:5px;
+		}
+		.btn-wrapper {
+			width:100%;
+		}
+		.no-color-a-fix:hover {
+			color:#FFFFFF !important;
+			text-decoration: none !important;
+		}
+		.well-ctr {
+			max-width:500px;
+			margin-right:auto;
+			margin-left:auto;
+		}
+		.well-top {
+			margin-top:10px;
+			margin-bottom:-30px;
+			background-color: #677B8F;
+		}
+		.btn-force {
+			margin-top:10px;
+		}
+		.well-body {
+			z-index:100;
+		}
+		.profile-img {
+			width:100px;
+			height:100px;
+			-webkit-border-radius: 50px;
+			-moz-border-radius: 50px;
+			border-radius: 50px;
+		}
+		.copyright {
+			font-size:14px;
+			font-weight:bold;
+		}
+		#is_ie {
+			z-index:200;
+		}
+	</style>
+	<body class="loading">
+		<div id="wrapper">
+			<div id="bg"></div>
+			<div id="overlay"></div>
+			<div id="main">
+
+				<!-- Header -->
+					<header id="header">
+						<!-- Start IE Complaint -->
+						<div id='is_ie' class="modal" style='display:none;'>
+						  <div class="modal-dialog">
+						    <div class="modal-content">
+						      <div class="modal-header">
+						        <h4 class="modal-title">Oh no...</h4>
+						      </div>
+						      <div class="modal-body">
+						        <p>Sorry, due to technical limitations we do not support Internet Explorer. Please, upgrade your browser too Firefox or Chrome. You may continue, but issues may occur.</p>
+						      </div>
+						      <div class="modal-footer">
+						        <button type="button" class="btn btn-default" onclick="location.back();">Leave</button>
+						        <button type="button" class="btn btn-primary" onclick="$('#is_ie').hide();">Onward!</button>
+						      </div>
+						    </div>
+						  </div>
+						</div>
+						<!-- End IE Complaint -->
+
+						<div class="well well-ctr well-top">
+							<h1>Twimber v2</h1>
+							<p>Smart <a class="no-color-a-fix" href="http://twitter.com">Twitter</a> client, for the user.</p>
+						</div>
+						<nav>
+							<div class="well well-ctr well-body">
+								<!-- Logging in section -->
+								<div id='logging_in' style="width:100%;display:none;">
+									<div id='notification'>
+										<h2>Logging you in...</h2>
+										<p>Please wait</p>
+									</div>
+									<div class="progress">
+									  <div id='loginstatus' class="progress-bar" style="width: 20%;"></div>
+									</div>
+									<br />
+								</div>
+								<!-- End Logging In -->
+								<div class='login-wrapper'>
+									<div style='width:100%;'><input class="form-control" type='text' id='user' placeholder="@username" value="" required/></div>
+									<!-- <div style='width:100%;'><input class="form-control" type='password' id='pass' placeholder="Password" value=""/></div> -->
+									<div class="btn-wrapper btn-force">
+										<button id='onebtnonentn' class='btn btn-success btn-wrapper' onclick='doLogin($("#user").val(), $("#pass").val())'>Login</button>
+										<!-- <button class='btn btn-info btn-wrapper' style='margin-top:5px' onclick='doRegister'>Register</button> -->
+									</div>
+								</div>
+								<div>
+									<div id='btn-return' style='display:none;width:100%;'>
+										<button class='btn btn-danger btn-wrapper' onclick='doReturn()'>Return</button>
+									</div>
+									<div class='pin-wrapper' style='display:none;width:100%'>
+										<input class='form-control' type="int" id='pin' placeholder="1234567" value=""/>
+										<div class='btn-wrapper btn-force'>
+											<button id='onebtnonentn' class='btn btn-info btn-wrapper' onclick='doLoginP2($("#pin").val())'>Finish</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</nav>
+					</header>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<span class="copyright">With love, <a class="no-color-a-fix" href="http://rdashinc.github.io/">RDashINC</a>.</span>
+					</footer>
+				
+			</div>
+		</div>
+		<script>
+		function doLogin(user) {
+			user.replace("@", "");
+			console.log("[main] Attempting login");
+			var top_h = $(".well-top").height();
+			var bot_h = $(".well-body").height();
+			var bot_nh = top_h+bot_h;
+			$("#logging_in").height(top_h+15);
+
+			// Create slide effect.
+			$(".well-top").slideUp("fast");
+			$("#logging_in").slideDown("fast");
+
+			// Disable Inputs.
+			$("input").attr('disabled', '');
+
+			// Hide Button Group
+			$(".login-wrapper").hide();
+
+			// Fix Inputs.
+			resetInput();
+
+			// Call Window
+			tlib.requestPin(user);
+
+			// Show PIN form.
+			$(".pin-wrapper").show();
+		}
+
+		function doLoginP2(pin) {
+			// Call tlib
+			$(".progress-bar").width("40%")
+			tlib.getAuthToken(pin, global.requestParams);
+			delete global.requestParams;
+		}
+
+		function resetInput() {
+			$("input").prop("disabled", false);
+		}
+
+		function triggerIE() {
+			$("#is_ie").show();
+		}
+
+		function doReturn() {
+			$("#logging_in").hide();
+			$(".pin-wrapper").hide();
+			$("#btn-return").hide();
+			$(".login-wrapper").show();
+			$("#notification").html("<h2>Logging you in...</h2>\n<p>Please wait</p>")
+			$(".progress-bar").width("20%")
+			$(".well-top").slideDown("fast");
+		}
+		</script>
+	</body>
+	<script>
+		$("body").backstretch("http://wallpaper-api.herokuapp.com/")
+
+		// Check if the config obj is set
+		var file = tlib.getConfigObj()
+		if(file.name!=="") {
+			console.log("Found config for user: "+file.name)
+			console.log("at: "+file.credentials[file.name].access_token+" ats: "+file.credentials[file.name].access_token_secret)
+			tlib.initializeTwit(file.credentials[file.name].access_token, file.credentials[file.name].access_token_secret);
+
+			/** this unifies the config checking, and if it's not legit or some other issue then it uses the same error seq. **/
+			tlib.checkCredentials()
+		}
+	</script>
+</html>

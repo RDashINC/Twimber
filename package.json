@@ -1,0 +1,23 @@
+{
+  "main": "src/index.html",
+  "name": "twimber",
+  "description": "Multi-User, modern Twitter Client.",
+  "version": "2.0.3",
+  "license": "GNUGPLv3",
+  "author" : {
+    "name": "RainbowDashDC",
+    "email": "allardj64@gmail.com",
+    "url": "http://rainbowdashdc.github.io/"
+  },
+  "dependencies": {
+    "twit": "*",
+    "utf8": "*",
+    "request": "*",
+    "form-data": "*"
+  },
+  "window": {
+    "min-width": "481",
+    "min-height": "550"
+  },
+  "repository": "http://github.com/RDashINC/Twimber"
+}

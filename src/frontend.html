@@ -1,0 +1,474 @@
+<!DOCTYPE HTML>
+<!--
+	Twimber2 by RDashINC
+	http://rdashinc.github.io/ | @rdashinc
+	
+	Free for use, and development purposes.
+-->
+<html>
+	<head>
+		<title>Twimber v2</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		
+		<!-- Allow bootstrap override, place after -->
+		<link rel="stylesheet" href="css/bootstrap.min.css" />
+		<link rel="stylesheet" href="css/font-awesome.min.css" />
+		<script src="js/jquery-2.0.3.min.js"></script>
+		<script src="js/jquery.drags.min.js"></script>
+		<script src="js/jquery.backstretch.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		
+		<!-- Nodeifcations (Nodewebkit+Desktop Notifications) -->
+		<script src="js/nodeifications.js"></script>
+
+		<!-- Twitter/OAuth Libs -->
+		<script src="js/jsOAuth-1.1.min.js"></script>
+		<script src="js/twitter.js"></script>
+		<script src="js/tabs.js"></script>
+		<script type="text/javascript">
+			var index = new Object();
+			index.isDone = function() {
+
+			}
+			index.throwError = function(err) {
+				// Something that displays an error goes here.
+
+				// For now we output it console.
+				console.log("index.throwError => '"+err+"'")
+			}
+
+			/** Rebuild the obj **/
+			if(global.ck === undefined || global.cs === undefined) {
+				window.location = "index.html"
+			} else {
+				tlib.setConsumer(global.ck, global.cs)
+				tlib.initializeTwit(global.at, global.ats);
+				tlib.checkCredentials();
+				// Uncomment for production. tlib.clean();
+			}
+		</script>
+	</head>
+
+	<style>
+		body {
+			height:100%;
+			background-color:#3e4a56;
+			margin:0px 0px 0px 0px;
+			overflow-x:hidden;
+		}
+		hr {
+			height: 0;
+			-webkit-box-sizing: content-box;
+			-moz-box-sizing: content-box;
+			box-sizing: content-box;
+		}
+		hr {
+			margin-top: 20px;
+			margin-bottom: 20px;
+			border: 0;
+			border-top: 1px solid #eee;
+		}
+		.left {
+			float:left;
+		}
+		.right {
+			float:right
+		}
+		/** Wrappers/Main Content related **/
+		.sidebar {
+			position:absolute;
+			width:75px;
+			background-color:#333333;
+		}
+		.wrapper
+		{
+		    min-height:100%;
+		    width:100%;
+		    position:relative;
+		    display:inline-block;
+		}
+		.content {
+			margin-left:75px;
+			overflow-x:auto;
+			overflow-y:initial;
+			overflow:initial;
+		}
+		/** Sidebar **/
+		.sidebar-footer {
+			position:relative;
+			bottom:0;
+			background-color:#333333;
+		}
+		.sidebar-divider {
+			margin-right:5px;
+			margin-left:5px;
+			margin-bottom:auto;
+		}
+		.icon-wrapper {
+			height:auto;
+			width:auto;
+			margin: 0 auto;
+			text-align:center;
+			margin:0 auto;
+		}
+		.icon-text {
+			font-size:40px;
+			text-align:center;
+		}
+		.icon-text:hover a {
+			color:#FFF !important;
+		}
+		.icon-text a {
+			color:#c1c1c1 !important;
+			text-decoration:none !important;
+		}
+		/** Section aka tabs **/
+		.section-wrapper {
+			float:left;
+			position:relative;
+			background-color:#474747;
+			min-width:300px;
+			max-width:420px;
+			width:100%;
+
+			margin: 5px 5px 5px 5px;
+		}
+		.section-header {
+			height:50px;
+			width:100%;
+		}
+		.section-body {
+			background-color:#FFFFFF;
+			/** #848484 **/
+		}
+		.section-tweets {
+			overflow-y:auto;
+			overflow-x:hidden;
+			width:100%;
+			height:100%;
+		}
+		.section-icon {
+			font-size:30px;
+			float:left;
+			margin-right:10px;
+			margin-top:2px;
+			margin-left:10px;
+		}
+		.section-icon-settings {
+			font-size:30px;
+			float:right;
+			margin-right:15px;
+			margin-top:-35px;
+		}
+		.section-header-text {
+			padding-top:10px;
+			font-size:20px;
+		}
+		/** Tweets **/
+		.tweet-pimg {
+		    height:60px;
+		    width:60px;
+		    margin:10px;
+		    
+		    /** Rounded Corners **/
+		    -webkit-border-radius: 90px;
+		    -moz-border-radius: 90px;
+		    border-radius: 90px;
+		}
+		.tweet {
+		 background-color:#FFFFFF; 
+		}
+		.tweet-body {
+		  height:auto;
+		}
+		.media-actions {
+		  margin-right:10px;
+		  width:auto;
+		  color:#474747;
+		  float:right;
+		}
+		.loading-gif-wrapper {
+			margin-top:20px;
+			text-align:center;
+			margin-bottom:20px;
+		}
+		.tweet-body {
+			color:black;
+			margin-right:20px;
+			word-wrap:break-word;
+			min-height:50px;
+		}
+		.tweet-at-link,
+		.tweet-link,
+		.tweet-hashtag {
+			color:#00cccc;
+		}
+		.tweet-info {
+			color:#474747;
+			float:left;
+			margin-left:10px;
+			font-size:12px;
+			margin-top:2px;
+		}
+		.tweet-at {
+			font-size:15px;
+			color:#cccccc !important;
+			text-decoration:none;
+		}
+		.tweet-at:hover {
+			text-decoration:none;
+			color:#cccccc !important;
+		}
+		.tweet-info a:hover {
+			text-decoration:none !important;
+		}
+		.tweet-screen_name {
+			font-size:16px;
+			color:#999999;
+		}
+		/** Profile **/
+		.info {
+			position:relative;
+	    	height:275px;
+	    	width:100%;
+	    	background-color:#adadad;
+	    	-webkit-box-shadow:inset 1px 1px 110px 15px #000000;
+	    	box-shadow:inset 1px 1px 110px 15px #000000;
+	  	}
+		.info img {
+	    	margin-top:10px;
+	    	height:100px;
+	    	width:auto;
+	    	-webkit-border-radius: 90px;
+	    	-moz-border-radius: 90px;
+	    	border-radius: 90px; 
+		}
+		.info-wrapper {
+			text-align:center;
+			position:absolute;
+			width:100%;
+		}
+		.info a:hover {
+			color:#FFF !important;
+			text-decoration: none !important;
+		}
+		.entities-username {
+			font-size:22px;
+			color:#FFF;
+			font-weight:bold;
+		}
+		.entities-at {
+			font-size:17px;
+			color:#fff; 
+		}
+		.entities-bio {
+			font-weight:bold;
+			margin:5px;
+		}
+		.info-background {
+			background-color:#999;
+			position:absolute;
+			width:100%;
+			height:100%;
+			opacity:0.30;
+			z-index:10;
+		}
+		.rollup {
+			background-color:#999;
+			width:100%;
+			height:40px;
+			text-align:center;
+			font-size:30px;
+		}
+		.rollup:hover {
+			background-color:#7a7a7a;
+		}
+		.rb:hover {
+			color:#000000; 
+		}
+		/** New Tweet Dialog **/
+		.new-tweet {
+			width: 450px;
+			height: 250px;
+			background-color: #999;
+	  		position: absolute;
+	  		top:0;
+	  		bottom: 0;
+	  		left: 0;
+	  		right: 0;
+	  		-webkit-touch-callout: none;
+	  		-webkit-user-select: none;
+	  		-khtml-user-select: none;
+	  		-moz-user-select: none;
+	  		-ms-user-select: none;
+	  		user-select: none;
+	  		margin: auto;
+	  		-webkit-box-shadow: 0px 0px 18px 0px rgba(50, 50, 50, 1);
+	  		-moz-box-shadow:    0px 0px 18px 0px rgba(50, 50, 50, 1);
+	  		box-shadow:         0px 0px 18px 0px rgba(50, 50, 50, 1);
+	  		z-index:1000000;
+		}
+		.new-tweet-header  {
+			height:50px;
+			width:100%;
+			background-color:#2d2d2d;
+		}
+		.new-tweet-body {
+	  	
+	  	}
+		.new-tweet-body textarea {
+			height:150px;
+			width:100%;
+			max-height:150px;
+			max-width: 100%;
+		}
+		.new-tweet-button-wrapper {
+			width:100%;
+			height:50px;
+		}
+		.new-tweet-header-text {
+			font-size:18px;
+			font-weight:;
+			margin-left:10px;
+			padding-top:15px;
+		}
+	</style>
+
+	<body>
+		<div class='wrapper'>
+			<div class='sidebar'>
+				<div class='sidebar-main'>
+					<div class='icon-wrapper'>
+						<div class='icon-text'>
+							<a class='fa fa-pencil-square-o' onclick="$('.new-tweet').show()"></a>
+						</div>
+					</div>
+					<hr class='sidebar-divider' style='margin-top:auto;margin-bottom:15px' />
+					<div class='icon-wrapper'>
+						<div class='icon-text'>
+							<a class='fa fa-home'></a>
+						</div>
+					</div>
+					<div class='icon-wrapper'>
+						<div class='icon-text'>
+							<a class='fa fa-user'></a>
+						</div>
+					</div>
+					<div class='icon-wrapper'>
+						<div class='icon-text'>
+							<a class='fa fa-envelope'></a>
+						</div>
+					</div>
+				</div>
+
+				<div class='sidebar-footer'>
+					<hr class='sidebar-divider' />
+					<div class='icon-wrapper' style='margin-top:-20px;'>
+						<div class='icon-text' id='lag-wrapper'>
+							<i id='lag' class='fa fa-circle' style='font-size:10px;color:#000000;' title='Twitter API stream Lag.'></i>
+							<p id='lag-num' style='font-size:11px;margin-top:-12px;'>--</p>
+						</div>
+					</div>
+					<div class='icon-wrapper'>
+						<div class='icon-text'>
+							<a class='fa fa-cog'></a>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class='content'>
+				<br style="clear: left;" />
+			</div>
+			<div style='display:none;' class='new-tweet ui-widget-content'>
+				<div class='new-tweet-header'>
+					<p class='new-tweet-header-text'>New Tweet <i style='float:right;font-size:35px;padding-right:10px;margin-top:-7px;' class='fa fa-times' onclick='$(".new-tweet").hide();'></i></p>
+				</div>
+				<div class='new-tweet-body'>
+					<textarea id='new-tweet-text' class='form-control new-tweet-text' maxlength="140"></textarea>
+				</div>
+				<div class='new-tweet-button-wrapper'>
+					<button id='new-tweet-button-send' type='button' class='btn btn-info' onclick='postStatus($("#new-tweet-text").val())' style='width:100%;height:100%;'>Post Tweet</button>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		function postStatus(status) {
+			$("#new-tweet-text").prop("disabled", true);
+			$("#new-tweet-button-send").prop("disabled", true);
+			tlib.postStatus(status, function() {
+				$("#new-tweet-text").attr('disabled', '');
+				$("#new-tweet-text").val("");
+
+				/** Un disable input **/
+				$("#new-tweet-text").prop("disabled", false);
+				$("#new-tweet-button-send").prop("disabled", false);
+
+				/** Hide **/
+				$('.new-tweet').hide();
+			})
+		}
+
+
+		function redrawSidebar() {
+			console.log("[client] Redrawing sidebar.")
+
+			// Absolute window size, and for sections.
+			$(".sidebar").height($(window).height());
+			$("body").height($(window).height());
+			$(".content").height($(window).height());
+			$(".content").width($(window).width()-75);
+
+
+			// For The Bottom Element.
+			var nh = $(".sidebar").height()-$(".sidebar-main").height();
+			nh = nh-$(".sidebar-footer").height();
+			$(".sidebar-footer").attr('style', 'margin-top:'+nh+'px');
+
+			fixTweetContent();
+
+			// Fit tabs too window.
+			resizeTabs();
+		}
+
+		function fixTweetContent() {
+			$(".section-tweets").width($(".section-wrapper").width()-getScrollbarWidth()+17);
+		}
+
+		function getScrollbarWidth() {
+			var inner = document.createElement('p');
+			inner.style.width = "100%";
+			inner.style.height = "200px";
+
+			var outer = document.createElement('div');
+			outer.style.position = "absolute";
+			outer.style.top = "0px";
+			outer.style.left = "0px";
+			outer.style.visibility = "hidden";
+			outer.style.width = "200px";
+			outer.style.height = "150px";
+			outer.style.overflow = "hidden";
+			outer.appendChild (inner);
+
+			document.body.appendChild (outer);
+			var w1 = inner.offsetWidth;
+			outer.style.overflow = 'scroll';
+			var w2 = inner.offsetWidth;
+			if (w1 == w2) w2 = outer.clientWidth;
+
+			document.body.removeChild (outer);
+
+			return (w1 - w2);
+		}
+
+		/** Make Draggable 
+		$(function() {
+			$(".new-tweet").drags();
+		});**/
+
+		redrawSidebar();
+		$(window).on('resize', function() {
+			redrawSidebar();
+		});
+	</script>
+</html>
