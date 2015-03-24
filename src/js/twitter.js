@@ -17,9 +17,9 @@ String.prototype.contains = function(it) { return this.indexOf(it) != -1; };
 /**
  * Twitter Object construct, you should put anything that will be used across <all> functions here,
  * in such format: this.whatever = value
- * 
+ *
  * @constructor
- * 
+ *
  **/
 function twitter() {
 	/** Initialize, for OAuth. **/
@@ -105,42 +105,6 @@ twitter.prototype.getDMs = function(cb_div, cb) {
 		}
 	})
 };
-
-/**
- * Formats Hashtags, markdown, etc.
- *
- * @return str
- **/
-twitter.prototype.formatBody = function(text) {
-	if(typeof(text)==='undefined') {
-		// Fallback to original text.
-		return "<span style='color:red;'>[Twimber Error] empty text</span>";
-	}
-	var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;.]*[-A-Z0-9+&@#\/%=~_|])/i;
-	text = text.replace(exp, "<a href='$1' target='_blank' class='tweet-link'>$1</a>");
-	exp = /(^|\s)#(\w+)/g;
-	text = text.replace(exp, "$1<a class='tweet-hashtag' id='$2'>#$2</a>");
-	exp = /(^|\s|.)@(\w+)/g;
-	text = text.replace(exp, "$1<a class='tweet-at-link'>@$2</a>");
-
-	/** Markdown Italics **/
-	exp = /(^|\s|.)\/(\w+)\//g;
-	text = text.replace(exp, "$1<i>$2</i>");
-	exp = /(^|\s|.)\/(\w+)\//g;
-	text = text.replace(exp, "$1<i>$2</i>");
-
-	/** Markdown Bold **/
-	exp = /(^|\s|.)\*\*(\w+)\*\*/g;
-	text = text.replace(exp, "$1<strong>$2</strong>");
-	exp = /(^|\s|.)\_\_(\w+)\_\_/g;
-	text = text.replace(exp, "$1<strong>$2</strong>");
-
-	/** Markdown code **/
-	exp = /(^|\s|.)\`(\w+)\`/g;
-	text = text.replace(exp, "$1<pre>$2</pre>");
-	
-	return text;
-}
 
 twitter.prototype.lookUpUser = function(user, cb) {
 	if(cb===undefined) {
@@ -239,6 +203,7 @@ twitter.prototype.startStream = function(cb_div) {
 
 				ths.showLag(global.lag);
 
+				global.measure_tweet=false; // secondary precaution
 				delete global.measure_tweet;
 				delete global.recieved_tweet;
 			}
@@ -292,6 +257,34 @@ twitter.prototype.startStream = function(cb_div) {
 }
 
 /**
+ * Formats Hashtags, markdown, etc.
+ *
+ * @return str
+ **/
+twitter.prototype.formatBody = function(text) {
+	if(typeof(text)==='undefined') {
+		// Fallback to original text.
+		return "<span style='color:red;'>[Twimber Error] empty text</span>";
+	}
+	text = "<div class='tweet-body'>"+text;
+	var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;.]*[-A-Z0-9+&@#\/%=~_|])/i;
+	text = text.replace(exp, "[$1](#)");
+	exp = /(^|\s)#(\w+)/g;
+	text = text.replace(exp, "$1[#$2](#)");
+	exp = /(^|\s|.)@(\w+)/g;
+	text = text.replace(exp, "$1[@$2](#)");
+
+	// initial markdown
+	text = marked(text);
+
+	//text = text.replace(/^\<\p\>/g, "<p class='tweet-body'>"); // make regex more sound, could cause a bug
+
+	text = text+"</div>";
+
+	return text; // markdown parser causes weird issues
+}
+
+/**
  * Creates a string of tweets in HTML
  *
  * @return str
@@ -323,6 +316,7 @@ twitter.prototype.createFormattedTweet = function(tweet_objs) {
  * @return null
  **/
 twitter.prototype.createFavoriteTweet = function() {
+	index.throwError("Not implemented");
 	return false;
 }
 
@@ -332,19 +326,35 @@ twitter.prototype.createFavoriteTweet = function() {
  * @return str
  **/
 twitter.prototype.createaFormattedTweet = function(tobj) {
+	var retweeted_status=false;
+	if(typeof(tobj.retweeted_status)!=='undefined') {
+		console.log("[twitter] createFormattedTweet: Got a Retweet, formatting values.");
+
+		// hijack tobj object to be transparent.
+		tobj.user.screen_name = tobj.retweeted_status.user.screen_name;
+		tobj.user.name = tobj.retweeted_status.user.name;
+		tobj.user.profile_image_url = tobj.retweeted_status.user.profile_image_url;
+		tobj.source = tobj.retweeted_status.source;
+		tobj.created_at = tobj.retweeted_status.created_at;
+		tobj.text = tobj.text.replace('RT @'+tobj.retweeted_status.user.screen_name+': ', ''); // little hack to remvove RT @<name>:
+		tobj.id = tobj.retweeted_status.id;
+
+		retweeted_status=true;
+	}
+
 	var t = "";
-	t += "<div class='media tweet' id='"+tobj.id+"-tweet'>";
+	t += "<div class='media tweet' data-id='"+tobj.id+"' id='"+tobj.id+"-tweet'>";
 	t +="  <a class='pull-left' href='#'>";
 	t +="    <img class='media-object tweet-pimg' src='"+tobj.user.profile_image_url.replace("_normal", "")+"'>";
 	t +="  </a>";
 	t +="  <div class='media-body'>";
 	t +="    <h4 class='media-heading'><span class='tweet-screen_name'>"+tobj.user.name+"</span> - <a class='tweet-at' href='http://twitter.com/"+tobj.user.screen_name+"'>@"+tobj.user.screen_name+"</a></h4>";
-	t +="    <p class='tweet-body'>"+this.formatBody(tobj.text)+"</p>";
+	t +=     this.formatBody(tobj.text);
 	t +="  </div>";
 	t +="  <span class='media-actions'>";
-	t +="    <i class='glyphicon glyphicon-star'></i>";
+	t +="    <i class='glyphicon glyphicon-star' onclick=\"tlib.favorite('"+tobj.id+"', $(this));\"></i>";
 	t +="    &nbsp;";
-	t +="    <i class='glyphicon glyphicon-retweet'></i>";
+	t +="    <i class='glyphicon glyphicon-retweet' onclick=\"tlib.retweet('"+tobj.id+"', $(this));\"></i>";
 	t +="    &nbsp;";
 	t +="    <i class='glyphicon glyphicon-share-alt'></i>";
 	t +="  </span>";
@@ -362,7 +372,7 @@ twitter.prototype.createaFormattedTweet = function(tobj) {
  **/
 twitter.prototype.createFormattedDm = function(tweet_objs) {
 	var t = "";
-	ths = this;
+	that = this;
 	$.each(tweet_objs, function(index, value) {
 		t += "<div class='media tweet' id='"+value.id+"-dm'>";
 		t +="  <a class='pull-left' href='#'>";
@@ -370,16 +380,11 @@ twitter.prototype.createFormattedDm = function(tweet_objs) {
 		t +="  </a>";
 		t +="  <div class='media-body'>";
 		t +="    <h4 class='media-heading'><span class='tweet-screen_name'>"+value.sender.name+"</span> - <a class='tweet-at' href='http://twitter.com/"+value.sender.screen_name+"'>@"+value.sender.screen_name+"</a></h4>";
-		t +="    <p class='tweet-body'>"+ths.formatBody(value.text)+"</p>";
+		t +=     that.formatBody(value.text);
 		t +="  </div>";
 		t +="  <span class='media-actions'>";
-		t +="    <i class='glyphicon glyphicon-star'></i>";
-		t +="    &nbsp;";
-		t +="    <i class='glyphicon glyphicon-retweet'></i>";
-		t +="    &nbsp;";
-		t +="    <i class='glyphicon glyphicon-share-alt'></i>";
 		t +="  </span>";
-		t +="  <span class='tweet-info'><span class='timestamp' title='"+value.created_at+"'>"+ths.relativeTime(value.created_at)+"</span></span>";
+		t +="  <span class='tweet-info'><span class='timestamp' title='"+value.created_at+"'>"+that.relativeTime(value.created_at)+"</span></span>";
 		t +="</div>";
 		t +="<hr />";
 	});
@@ -436,7 +441,7 @@ twitter.prototype.getTimeline = function(cb_div, cb) {
 	});
 };
 
-/** 
+/**
  * Start the Twit API wrapper, with access_token (at), and access_token_secret (ats)
  *
  * @return bool
@@ -497,10 +502,11 @@ twitter.prototype.checkCredentials = function(cb) {
 	this.T.get('account/verify_credentials', function(err, data, response) {
 		if(err) {
 			index.throwError("Auth token provided didn't work. Please try again, if this occurs again, please submit a bug report.");
+			console.log(response);
 			ths.user={};
 		} else {
 			/** Construct Local User obj **/
-      		ths.user = {};
+      ths.user = {};
 			ths.user.screen_name = data.screen_name;
 			ths.user.user_id = data.user_id;
 			ths.user.name = data.name;
@@ -516,18 +522,19 @@ twitter.prototype.checkCredentials = function(cb) {
 			var filestringify=JSON.stringify(file);
 			ths.fs.writeFileSync(ths.config, filestringify);
 
+			/** Move ths object to the actual this **/
+			this.user = ths.user;
+
+			console.log("AUTHSUCCESS")
+
 			/** Signigfy success **/
-			index.isDone();
+			if(cb!==undefined) {
+				cb();
+			} else {
+				index.isDone();
+			}
 		}
 	});
-
-	/** Move ths object to the actual this **/
-	this.user = ths.user;
-
-	/** optional callback **/
-	if(cb!==undefined) {
-		cb()
-	}
 }
 
 /**
@@ -539,7 +546,7 @@ twitter.prototype.getAuthToken = function(pin, auth) {
 	var ths = this
 	this.oauth.get('https://twitter.com/oauth/access_token?oauth_verifier='+pin+'&'+auth, function(data) {
 		console.dir(data);
-			
+
 		/** "Explode" the query string as needed. **/
 		var accessParams = {};
 		var qvars_tmp = data.text.split('&');
@@ -547,7 +554,7 @@ twitter.prototype.getAuthToken = function(pin, auth) {
 		var y = qvars_tmp[i].split('=');
 			accessParams[y[0]] = decodeURIComponent(y[1]);
 		}
-		
+
 		/** Start the Twit OBJ **/
 		if(ths.initializeTwit(accessParams.oauth_token, accessParams.oauth_token_secret)!==true) {
 			index.throwError("Couldn't initalize Twit");
@@ -572,9 +579,9 @@ twitter.prototype.getAuthToken = function(pin, auth) {
 		delete global.tmpuser;
 
 		ths.checkCredentials();
-	}, function(data) { 
+	}, function(data) {
 		index.throwError("Couldn't log you in, please try again later.");
-	});		
+	});
 };
 
 /**
@@ -586,13 +593,13 @@ twitter.prototype.getAuthToken = function(pin, auth) {
 twitter.prototype.requestPin = function (user) {
 	console.log("[twitter] /deprecated/ requestPin: Attempting to start an OAuth PIN Req.");
 		this.oauth.get('https://twitter.com/oauth/request_token',
- 
+
 			function(data) {
 				console.dir(data);
 				window.open('https://twitter.com/oauth/authorize?'+data.text+"&screen_name="+user+"&force_login=true");
 				global.requestParams = data.text;
 			},
- 
+
 			function(data) {
 				index.throwError("Couldn't get a OAuth token.")
 			}
@@ -621,6 +628,46 @@ twitter.prototype.postStatus = function(status, cb) {
 	  }
 	});
 };
+
+/**
+ * Attempts to retweet a tweet of :id
+ *
+ * @return undefined
+ **/
+twitter.prototype.favorite = function(id, obj) {
+	console.log("[twitter] fav: Attempting to fav tweet with id of '"+id+"'");
+	this.T.post('favorites/create', { id: id }, function (err, data, response) {
+		if(err) {
+			index.throwError(err);
+			console.log(response);
+		} else {
+			$(obj).addClass("favorited");
+		}
+
+		//  DEBUG: output object
+		console.log(data);
+	});
+}
+
+/**
+ * Attempts to favourite a tweet of :id
+ *
+ * @return undefined
+ **/
+twitter.prototype.retweet = function(id, obj) {
+	console.log("[twitter] fav: Attempting to fav tweet with id of '"+id+"'");
+	this.T.post('statuses/retweet/:id', { id: id }, function (err, data, response) {
+		if(err) {
+			index.throwError(err);
+		} else {
+			// should be a this object
+			$(obj).addClass("retweeted");
+		}
+
+		// DEBUG: Output object
+		console.log(data);
+	});
+}
 
 /**
  * Attempts too post <file> as an image too twitter, with <status>
@@ -653,6 +700,7 @@ twitter.prototype.postStatusWithMedia = function(status, file, cb) {
 		r.setHeader('content-length', length);
 	});
 
+	/** why this? **/
 	function requestCallback(err, res, body) {
 		cb(err, res, body)
 	}

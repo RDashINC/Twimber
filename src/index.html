@@ -13,7 +13,7 @@
 		<meta name="description" content="" />
 		<meta name="keywords" content="" />
 		<!--[if lte IE 8]><script src="css/ie/html5shiv.js"></script><![endif]-->
-		
+
 		<!-- Allow bootstrap override, place after -->
 		<link rel="stylesheet" href="css/bootstrap.min.css" />
 		<script src="js/jquery-2.0.3.min.js"></script>
@@ -38,6 +38,10 @@
 		<script type="text/javascript">
 			var index = new Object();
 			index.throwError = function(err) {
+				$(".well-top").hide();
+				$("#logging_in").show();
+				$(".pin-wrapper, .login-wrapper, .progress").hide();
+
 				$("#notification").html("<h2>An Error Occured</h2><p>"+err+"</p>");
 				$(".progress-bar").attr("style", "width:100%;");
 				$(".pin-wrapper").hide();
@@ -85,10 +89,10 @@
 
 			$(window).on('load', function() {
 				resetInput();
-				
+
 				if(isIE()){
 					triggerIE();
-				} 
+				}
 			});
 		</script>
 	</head>
@@ -128,7 +132,6 @@
 		}
 		.copyright {
 			font-size:14px;
-			font-weight:bold;
 		}
 		#is_ie {
 			z-index:200;
@@ -204,9 +207,9 @@
 
 				<!-- Footer -->
 					<footer id="footer">
-						<span class="copyright">With love, <a class="no-color-a-fix" href="http://rdashinc.github.io/">RDashINC</a>.</span>
+						<span class="copyright">With love, <a class="no-color-a-fix" href="http://rdashinc.github.io/">RDashINC</a>. </span>
 					</footer>
-				
+
 			</div>
 		</div>
 		<script>
@@ -220,7 +223,9 @@
 
 			// Create slide effect.
 			$(".well-top").slideUp("fast");
+			$(".progress").show();
 			$("#logging_in").slideDown("fast");
+
 
 			// Disable Inputs.
 			$("input").attr('disabled', '');
@@ -259,22 +264,28 @@
 			$("#btn-return").hide();
 			$(".login-wrapper").show();
 			$("#notification").html("<h2>Logging you in...</h2>\n<p>Please wait</p>")
-			$(".progress-bar").width("20%")
+			$(".progress-bar").width("20%");
 			$(".well-top").slideDown("fast");
 		}
 		</script>
 	</body>
 	<script>
-		$("body").backstretch("http://wallpaper-api.herokuapp.com/")
+		// set wallpaper
+		var fs = require("fs");
+		var bkg = fs.readdirSync("src/img/bkg");
+		console.log(bkg); // output the raw object for testing. Doesn't harm users.
+		var max = bkg.length-1 // has an extra length for a non-apparent reason to me.
+		var num =  Math.floor(Math.random()*(max-0+1)+0);
+		$("body").backstretch("img/bkg/"+bkg[num]);
 
 		// Check if the config obj is set
-		var file = tlib.getConfigObj()
+		var file = tlib.getConfigObj();
 		if(file.name!=="") {
 			console.log("Found config for user: "+file.name)
-			console.log("at: "+file.credentials[file.name].access_token+" ats: "+file.credentials[file.name].access_token_secret)
+			console.log("at: "+file.credentials[file.name].access_token+" ats: "+file.credentials[file.name].access_token_secret); // remove on release
 			tlib.initializeTwit(file.credentials[file.name].access_token, file.credentials[file.name].access_token_secret);
 
-			/** this unifies the config checking, and if it's not legit or some other issue then it uses the same error seq. **/
+			/** this unifies the config checking **/
 			tlib.checkCredentials()
 		}
 	</script>

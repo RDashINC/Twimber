@@ -23,7 +23,7 @@ function genTab(type, user) {
 
 			// Fill Tab
 			tlib.getTweets(user, "#"+user+"-t-tweets");
-			
+
 			// Fill Header Image
 			$("#"+user).backstretch(tl.profile_banner_url);
 			resizeTabs("user", user);
@@ -51,7 +51,7 @@ function genHomeTab(dry) {
 	new_tab +="				"+tlib.user.screen_name+"/home";
 	new_tab +="			</div>";
 	new_tab +="			<div class='section-icon-settings'>";
-	new_tab +="				<i class='fa fa-times' onclick='tlib.killStream();$(\"#home-tab\").remove();'></i>";
+	new_tab +="				<i class='glyphicon glyphicon-remove' onclick='tlib.killStream();$(\"#home-tab\").remove();'></i>";
 	new_tab +="			</div>";
 	new_tab +="		</div>";
 	new_tab +="		<div class='section-body' id='home-tab-body'>";
@@ -76,7 +76,7 @@ function genMentionsTab(dry) {
 	new_tab +="				"+tlib.user.screen_name+"/mentions";
 	new_tab +="			</div>";
 	new_tab +="			<div class='section-icon-settings'>";
-	new_tab +="				<i class='fa fa-times' onclick='$(\"#mentions-tab\").remove();'></i>";
+	new_tab +="				<i class='glyphicon glyphicon-remove' onclick='$(\"#mentions-tab\").remove();'></i>";
 	new_tab +="			</div>";
 	new_tab +="		</div>";
 	new_tab +="		<div class='section-body' id='mentions-tab-body'>";
@@ -102,7 +102,7 @@ function genBlankTab(user, name) {
 	new_tab +="				"+name;
 	new_tab +="			</div>";
 	new_tab +="			<div class='section-icon-settings'>";
-	new_tab +="				<i class='fa fa-times' onclick='$(\"#"+user+"-tab\").remove();'></i>";
+	new_tab +="				<i class='glyphicon glyphicon-remove' onclick='$(\"#"+user+"-tab\").remove();'></i>";
 	new_tab +="			</div>";
 	new_tab +="		</div>";
 	new_tab +="		<div class='section-body' id='section-body-"+user+"'>";
@@ -151,7 +151,7 @@ function genUserTab(tl, name) {
 	new_tab +="				@"+tl.screen_name+"/tweets";
 	new_tab +="			</div>";
 	new_tab +="			<div class='section-icon-settings'>";
-	new_tab +="				<i class='fa fa-times' onclick='$('></i>";
+	new_tab +="				<i class='glyphicon glyphicon-remove' onclick='$('></i>";
 	new_tab +="			</div>";
 	new_tab +="		</div>";
 	new_tab +="		<div class='info' id='"+tl.screen_name+"'>";
@@ -196,7 +196,7 @@ function show(usr) {
 }
 
 function genMessageTab() {
-	var new_tab = "<div class='section-wrapper dm-tab'>";
+	var new_tab = "<div id='dm-tab' class='section-wrapper dm-tab'>";
 	new_tab +="	<div class='section-header'>";
 	new_tab +="			<div class='section-icon'>";
 	new_tab +="				<i class='fa fa-envelope'></i>";
@@ -205,7 +205,7 @@ function genMessageTab() {
 	new_tab +="				Direct Messages";
 	new_tab +="			</div>";
 	new_tab +="			<div class='section-icon-settings'>";
-	new_tab +="				<i class='fa fa-times' onclick='$(\"#dm-tab\").remove();'></i>";
+	new_tab +="				<i class='glyphicon glyphicon-remove' onclick='$(\"#dm-tab\").remove();'></i>";
 	new_tab +="			</div>";
 	new_tab +="		</div>";
 	new_tab +="		<div class='section-body' id='dm-tab-body'>";

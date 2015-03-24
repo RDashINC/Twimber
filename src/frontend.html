@@ -2,14 +2,14 @@
 <!--
 	Twimber2 by RDashINC
 	http://rdashinc.github.io/ | @rdashinc
-	
+
 	Free for use, and development purposes.
 -->
 <html>
 	<head>
 		<title>Twimber v2</title>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		
+
 		<!-- Allow bootstrap override, place after -->
 		<link rel="stylesheet" href="css/bootstrap.min.css" />
 		<link rel="stylesheet" href="css/font-awesome.min.css" />
@@ -17,19 +17,17 @@
 		<script src="js/jquery.drags.min.js"></script>
 		<script src="js/jquery.backstretch.min.js"></script>
 		<script src="js/bootstrap.min.js"></script>
-		
+
 		<!-- Nodeifcations (Nodewebkit+Desktop Notifications) -->
 		<script src="js/nodeifications.js"></script>
 
 		<!-- Twitter/OAuth Libs -->
 		<script src="js/jsOAuth-1.1.min.js"></script>
+		<script src="js/marked.min.js"></script>
 		<script src="js/twitter.js"></script>
 		<script src="js/tabs.js"></script>
 		<script type="text/javascript">
 			var index = new Object();
-			index.isDone = function() {
-
-			}
 			index.throwError = function(err) {
 				// Something that displays an error goes here.
 
@@ -43,7 +41,10 @@
 			} else {
 				tlib.setConsumer(global.ck, global.cs)
 				tlib.initializeTwit(global.at, global.ats);
-				tlib.checkCredentials();
+				tlib.checkCredentials(function() {
+					/** user object becomes available after validation */
+					initTabs();
+				});
 				// Uncomment for production. tlib.clean();
 			}
 		</script>
@@ -142,6 +143,7 @@
 			/** #848484 **/
 		}
 		.section-tweets {
+			padding-top:20px;
 			overflow-y:auto;
 			overflow-x:hidden;
 			width:100%;
@@ -169,14 +171,14 @@
 		    height:60px;
 		    width:60px;
 		    margin:10px;
-		    
+
 		    /** Rounded Corners **/
 		    -webkit-border-radius: 90px;
 		    -moz-border-radius: 90px;
 		    border-radius: 90px;
 		}
 		.tweet {
-		 background-color:#FFFFFF; 
+		 background-color:#FFFFFF;
 		}
 		.tweet-body {
 		  height:auto;
@@ -193,9 +195,16 @@
 			margin-bottom:20px;
 		}
 		.tweet-body {
-			color:black;
+			color: #292F33;
+			cursor: pointer;
+			font-family: Arial,Verdana,sans-serif;
+			font-size: 13px;
+			font-weight: 400;
+			text-rendering: auto;
+			white-space: pre-wrap;
+			word-wrap: break-word;
+
 			margin-right:20px;
-			word-wrap:break-word;
 			min-height:50px;
 		}
 		.tweet-at-link,
@@ -229,19 +238,17 @@
 		/** Profile **/
 		.info {
 			position:relative;
-	    	height:275px;
-	    	width:100%;
-	    	background-color:#adadad;
-	    	-webkit-box-shadow:inset 1px 1px 110px 15px #000000;
-	    	box-shadow:inset 1px 1px 110px 15px #000000;
-	  	}
+	    height:275px;
+	    width:100%;
+	    background-color:#adadad;
+	  }
 		.info img {
 	    	margin-top:10px;
 	    	height:100px;
 	    	width:auto;
 	    	-webkit-border-radius: 90px;
 	    	-moz-border-radius: 90px;
-	    	border-radius: 90px; 
+	    	border-radius: 90px;
 		}
 		.info-wrapper {
 			text-align:center;
@@ -259,19 +266,19 @@
 		}
 		.entities-at {
 			font-size:17px;
-			color:#fff; 
+			color:#fff;
 		}
 		.entities-bio {
 			font-weight:bold;
 			margin:5px;
 		}
-		.info-background {
-			background-color:#999;
+		#info-background {
 			position:absolute;
 			width:100%;
 			height:100%;
-			opacity:0.30;
 			z-index:10;
+
+			background-image: linear-gradient(transparent 0px, rgba(17, 17, 17, 0.55) 100%);
 		}
 		.rollup {
 			background-color:#999;
@@ -284,7 +291,7 @@
 			background-color:#7a7a7a;
 		}
 		.rb:hover {
-			color:#000000; 
+			color:#000000;
 		}
 		/** New Tweet Dialog **/
 		.new-tweet {
@@ -314,7 +321,7 @@
 			background-color:#2d2d2d;
 		}
 		.new-tweet-body {
-	  	
+
 	  	}
 		.new-tweet-body textarea {
 			height:150px;
@@ -331,6 +338,28 @@
 			font-weight:;
 			margin-left:10px;
 			padding-top:15px;
+		}
+
+		.retweeted {
+			color:#77B255 !important;
+		}
+
+		.favorited {
+			color:#FFAC33 !important;
+		}
+		.setting-fade {
+			height: 100%;
+	    width: 100%;
+	    left: 0;
+	    top: 0;
+	    overflow: hidden;
+	    position: fixed;
+
+			/* pos and colour */
+			z-index:1000000;
+			background-color: rgba(0, 0, 0, 0.2);
+			background: rgba(0, 0, 0, 0.2);
+    	color: #FFFFFF;
 		}
 	</style>
 
@@ -371,7 +400,7 @@
 					</div>
 					<div class='icon-wrapper'>
 						<div class='icon-text'>
-							<a class='fa fa-cog'></a>
+							<a class='fa fa-cog' onclick='$(".setting-fade").show();'></a>
 						</div>
 					</div>
 				</div>
@@ -381,13 +410,27 @@
 			</div>
 			<div style='display:none;' class='new-tweet ui-widget-content'>
 				<div class='new-tweet-header'>
-					<p class='new-tweet-header-text'>New Tweet <i style='float:right;font-size:35px;padding-right:10px;margin-top:-7px;' class='fa fa-times' onclick='$(".new-tweet").hide();'></i></p>
+					<p class='new-tweet-header-text'>New Tweet <i style='float:right;font-size:35px;padding-right:10px;margin-top:-7px;' class='glyphicon glyphicon-remove' onclick='$(".new-tweet").hide();'></i></p>
 				</div>
 				<div class='new-tweet-body'>
 					<textarea id='new-tweet-text' class='form-control new-tweet-text' maxlength="140"></textarea>
 				</div>
 				<div class='new-tweet-button-wrapper'>
 					<button id='new-tweet-button-send' type='button' class='btn btn-info' onclick='postStatus($("#new-tweet-text").val())' style='width:100%;height:100%;'>Post Tweet</button>
+				</div>
+			</div>
+			<div style="display:none" class='setting-fade'>
+				<!-- settings object -->
+				<div class='new-tweet ui-widget-content'>
+					<div class='new-tweet-header'>
+						<p class='new-tweet-header-text'>New Tweet <i style='float:right;font-size:35px;padding-right:10px;margin-top:-7px;' class='glyphicon glyphicon-remove' onclick='$(".new-tweet, .setting-fade").hide();'></i></p>
+					</div>
+					<div class='new-tweet-body'>
+						<textarea id='new-tweet-text' class='form-control new-tweet-text' maxlength="140"></textarea>
+					</div>
+					<div class='new-tweet-button-wrapper'>
+						<button id='new-tweet-button-send' type='button' class='btn btn-info' onclick='postStatus($("#new-tweet-text").val())' style='width:100%;height:100%;'>Post Tweet</button>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -460,11 +503,6 @@
 
 			return (w1 - w2);
 		}
-
-		/** Make Draggable 
-		$(function() {
-			$(".new-tweet").drags();
-		});**/
 
 		redrawSidebar();
 		$(window).on('resize', function() {

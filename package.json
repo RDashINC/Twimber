@@ -1,7 +1,7 @@
 {
   "main": "src/index.html",
   "name": "twimber",
-  "description": "Multi-User, modern Twitter Client.",
+  "description": "Modern Twitter Client.",
   "version": "2.0.3",
   "license": "GNUGPLv3",
   "author" : {
@@ -19,5 +19,9 @@
     "min-width": "481",
     "min-height": "550"
   },
-  "repository": "http://github.com/RDashINC/Twimber"
+  "repository": {
+	"type": "git",
+	"url": "git://github.com/RDashINC/Twimber"
+  },
+  "private": true
 }
