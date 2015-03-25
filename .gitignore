@@ -2,3 +2,7 @@ node_modules/**
 bin/**
 src/cfg/config.json
 launch.cmd
+nw/**
+git/**
+update.cmd
+launch.cmd
