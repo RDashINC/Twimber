@@ -25,6 +25,7 @@
   ],
   "dependencies": {
     "bootstrap": "~3.3.5",
+    "font-awesome": "~4.4.0",
     "handlebars": "~4.0.2",
     "jquery": "~2.1.4",
     "jquery-backstretch": "~2.0.4",

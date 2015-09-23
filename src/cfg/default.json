@@ -9,22 +9,18 @@
 			"tabs": {
 				"1": {
 					"type":"home",
-					"name":"2root4you"
+					"name":"rylorjs"
 				},
 				"2": {
 					"type":"dm"
 				},
 				"3": {
 					"type":"user",
-					"name": "2root4you"
+					"name": "rylorjs"
 				}
 			}
 		}
 	},
 	"credentials": {
-		"2root4you": {
-			"auth_token": "",
-			"auth_token_secret": ""
-		}
 	}
 }
