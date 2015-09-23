@@ -5,6 +5,8 @@
  *
  **/
 
+var fs = require('fs');
+
 function genTab(type, user) {
 	if(type == "home") {
 		genHomeTab();
@@ -93,32 +95,19 @@ function genMentionsTab(dry) {
 
 
 function genBlankTab(user, name) {
-	var new_tab = "<div class='section-wrapper' id='"+user+"-tab'>";
-	new_tab +="	<div class='section-header'>";
-	new_tab +="			<div class='section-icon'>";
-	new_tab +="				<i class='fa fa-home'></i>";
-	new_tab +="			</div>";
-	new_tab +="			<div class='section-header-text'>";
-	new_tab +="				"+name;
-	new_tab +="			</div>";
-	new_tab +="			<div class='section-icon-settings'>";
-	new_tab +="				<i class='glyphicon glyphicon-remove' onclick='$(\"#"+user+"-tab\").remove();'></i>";
-	new_tab +="			</div>";
-	new_tab +="		</div>";
-	new_tab +="		<div class='section-body' id='section-body-"+user+"'>";
-	new_tab +="			<div class='section-tweets' id='user-home-tweets'>";
-	new_tab +="				<div class='loading-gif-wrapper'><img class='loading-gif' src='img/load.gif' /></div>";
-	new_tab +="			</div>";
-	new_tab +="		</div>";
-	new_tab +="	</div>";
+	var tab = Handlebars.getTemplate('blank-tab');
+	var new_tab = tab({
+		name: name,
+		user: user
+	})
 
 	// Gen new obj
 	$(".content").prepend(new_tab);
+
 	resizeTabs("home");
 }
 
 function initTabs() {
-	var fs = require('fs');
 	var cfg = fs.readFileSync('./src/cfg/config.json');
 	var cfg = JSON.parse(cfg);
 	var workspace = cfg.workspace;
@@ -143,33 +132,13 @@ function initTabs() {
 }
 
 function genUserTab(tl, name) {
-	var new_tab ="	<div class='section-header'>";
-	new_tab +="			<div class='section-icon'>";
-	new_tab +="				<i class='fa fa-user'></i>";
-	new_tab +="			</div>";
-	new_tab +="			<div class='section-header-text'>";
-	new_tab +="				@"+tl.screen_name+"/tweets";
-	new_tab +="			</div>";
-	new_tab +="			<div class='section-icon-settings'>";
-	new_tab +="				<i class='glyphicon glyphicon-remove' onclick='$('></i>";
-	new_tab +="			</div>";
-	new_tab +="		</div>";
-	new_tab +="		<div class='info' id='"+tl.screen_name+"'>";
-	new_tab +=" 	  <div class='"+name+"-bkg' id='info-background' style='z-index:200;'></div>";
-	new_tab +=" 	  <div class='info-wrapper' style='z-index:1000;'>";
-	new_tab +=" 	    <img src='"+tl.profile_image_url.replace('_normal', '')+"'/>";
-	new_tab +=" 	    <br />";
-	new_tab +=" 	    <div class='entities-username'>"+tl.name+"</div>";
-	new_tab +=" 	    <a class='entities-at' href='http://twitter.com/"+tl.screen_name+"'>@"+tl.screen_name+"</a>";
-	new_tab +=" 	    <p class='entities-bio'>"+tl.description+"</p>";
-	new_tab +=" 	 </div>";
-	new_tab +="		</div>";
-	new_tab +="		<div class='rollup rb' id='"+tl.screen_name+"-rlup' onclick='hide(\""+tl.screen_name+"\")'><i class='fa fa-chevron-up rollup-btn'></i></div>";
-	new_tab +="		<div id='section-body-"+tl.screen_name+"' class='section-body'>";
-	new_tab +="			<div class='section-tweets' id='"+name+"-t-tweets'>";
-	new_tab +="				<div class='loading-gif-wrapper'><img class='loading-gif' src='img/load.gif' /></div>";
-	new_tab +="			</div>";
-	new_tab +="		</div>";
+	var temp = Handlebars.getTemplate('user-tab');
+	var new_tab = temp({
+		name: name,
+		screen_name: tl.screen_name,
+		description: twemoji.parse(tl.description),
+		img: tl.profile_image_url.replace('_normal', '')
+	});
 
 	return new_tab;
 }

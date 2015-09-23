@@ -1,0 +1,39 @@
+.form-control {
+  margin-bottom:5px;
+}
+.btn-wrapper {
+  width:100%;
+}
+.no-color-a-fix:hover {
+  color:#FFFFFF !important;
+  text-decoration: none !important;
+}
+.well-ctr {
+  max-width:500px;
+  margin-right:auto;
+  margin-left:auto;
+}
+.well-top {
+  margin-top:10px;
+  margin-bottom:-30px;
+  background-color: #677B8F;
+}
+.btn-force {
+  margin-top:10px;
+}
+.well-body {
+  z-index:100;
+}
+.profile-img {
+  width:100px;
+  height:100px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  border-radius: 50px;
+}
+.copyright {
+  font-size:14px;
+}
+#is_ie {
+  z-index:200;
+}

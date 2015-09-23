@@ -1,0 +1,18 @@
+<div class='section-wrapper' id='{{user}}-tab'>
+  <div class='section-header'>
+		<div class='section-icon'>
+			<i class='fa fa-home'></i>
+		</div>
+		<div class='section-header-text'>
+			{{name}}
+		</div>
+		<div class='section-icon-settings'>
+			<i class='glyphicon glyphicon-remove' onclick='$("{{user}}-tab").remove();'></i>
+		</div>
+	</div>
+	<div class='section-body' id='section-body-{{user}}'>
+		<div class='section-tweets' id='user-home-tweets'>
+			<div class='loading-gif-wrapper'><img class='loading-gif' src='img/load.gif' /></div>
+		</div>
+	</div>
+</div>

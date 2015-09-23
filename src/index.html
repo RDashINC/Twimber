@@ -15,6 +15,7 @@
 
 		<!-- Allow bootstrap override, place after -->
 		<link rel="stylesheet" href="css/bootstrap.min.css" />
+		<link ref="stylesheet" href="css/index" />
 		<script src="bower_components/jquery/dist/jquery.min.js"></script>
 		<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 
@@ -64,47 +65,7 @@
 			});
 		</script>
 	</head>
-	<style>
-		.form-control {
-			margin-bottom:5px;
-		}
-		.btn-wrapper {
-			width:100%;
-		}
-		.no-color-a-fix:hover {
-			color:#FFFFFF !important;
-			text-decoration: none !important;
-		}
-		.well-ctr {
-			max-width:500px;
-			margin-right:auto;
-			margin-left:auto;
-		}
-		.well-top {
-			margin-top:10px;
-			margin-bottom:-30px;
-			background-color: #677B8F;
-		}
-		.btn-force {
-			margin-top:10px;
-		}
-		.well-body {
-			z-index:100;
-		}
-		.profile-img {
-			width:100px;
-			height:100px;
-			-webkit-border-radius: 50px;
-			-moz-border-radius: 50px;
-			border-radius: 50px;
-		}
-		.copyright {
-			font-size:14px;
-		}
-		#is_ie {
-			z-index:200;
-		}
-	</style>
+
 	<body class="loading">
 		<div id="wrapper">
 			<div id="bg"></div>
@@ -236,6 +197,8 @@
 
 			/** this unifies the config checking **/
 			tlib.checkCredentials()
+
+			window.location='frontend.html';
 		}
 	</script>
 </html>

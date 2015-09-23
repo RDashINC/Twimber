@@ -8,14 +8,10 @@
 			"name": "default",
 			"tabs": {
 				"1": {
-					"type":"home",
-					"name":"rylorjs"
-				},
-				"2": {
 					"type":"dm"
 				},
-				"3": {
-					"type":"user",
+				"2": {
+					"type":"home",
 					"name": "rylorjs"
 				}
 			}
