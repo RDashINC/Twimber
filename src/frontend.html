@@ -13,17 +13,16 @@
 		<!-- Allow bootstrap override, place after -->
 		<link rel="stylesheet" href="css/bootstrap.min.css" />
 		<link rel="stylesheet" href="css/font-awesome.min.css" />
-		<script src="js/jquery-2.0.3.min.js"></script>
-		<script src="js/jquery.drags.min.js"></script>
-		<script src="js/jquery.backstretch.min.js"></script>
-		<script src="js/bootstrap.min.js"></script>
+		<script src="bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="bower_components/jquery-backstretch/jquery.backstretch.min.js"></script>
+		<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 
 		<!-- Nodeifcations (Nodewebkit+Desktop Notifications) -->
 		<script src="js/nodeifications.js"></script>
 
 		<!-- Twitter/OAuth Libs -->
 		<script src="js/jsOAuth-1.1.min.js"></script>
-		<script src="js/marked.min.js"></script>
+		<script src="bower_components/marked/marked.min.js"></script>
 		<script src="js/twitter.js"></script>
 		<script src="js/tabs.js"></script>
 		<script type="text/javascript">
@@ -88,12 +87,15 @@
 		    position:relative;
 		    display:inline-block;
 		}
+
 		.content {
-			margin-left:75px;
-			overflow-x:auto;
-			overflow-y:initial;
-			overflow:initial;
+			padding-left:75px;
+			white-space: nowrap;
+			width: 100%;
+			overflow-x:visible;
+			height:100%;
 		}
+
 		/** Sidebar **/
 		.sidebar-footer {
 			position:relative;
@@ -123,16 +125,19 @@
 			color:#c1c1c1 !important;
 			text-decoration:none !important;
 		}
+
+
 		/** Section aka tabs **/
 		.section-wrapper {
-			float:left;
-			position:relative;
-			background-color:#474747;
-			min-width:300px;
-			max-width:420px;
-			width:100%;
-
-			margin: 5px 5px 5px 5px;
+			display:inline-block;
+		   margin-top:5px;
+		   white-space: normal;
+		   height:calc(100% - 10px);
+		   vertical-align: top;
+		   width:375px;
+		   max-width: 375px;
+		   margin-left:5px;
+		   background-color:#474747;
 		}
 		.section-header {
 			height:50px;

@@ -1,8 +1,4 @@
-node_modules/**
-bin/**
+node_modules
+bin
+bower_components
 src/cfg/config.json
-launch.cmd
-nw/**
-git/**
-update.cmd
-launch.cmd

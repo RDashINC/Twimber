@@ -1,15 +1,19 @@
 Twimber
 =========
 
-Twimber is a HTML5 and Javascript based Desktop/Web [Planned!] Twitter Client.
+Twimber is a HTML5 and Javascript based Desktop Twitter Client.
 
 Features
 ----
 
-- Multi-User support.
-- Same-Client DM Read marking Support.
-- Encrypt DMs too other Users.
-- Twitter stream API lag test.
+x = done
+
+/ = sorta done
+
+- Multi-User support. [/]
+- Same-Client DM Read marking Support. [ ]
+- Encrypt DMs too other Users. [ ]
+- Twitter stream API lag test. [x]
 
 
 Version
@@ -31,12 +35,21 @@ Twimber uses a number of open source projects to work properly:
 Using Source
 -----------
 
-You'll need a version of [node-webkit](https://github.com/rogerwang/node-webkit) [Any OS]
+You'll need a version of [NW.js](https://github.com/nwjs/nw.js) and [node/io].js. Also bower.
 
-Run it from the base directory (`%CD%`, or `$(pwd)`)
+```
+npm install -g bower
+```
 
+```
+cp src/cfg/default.json src/cfg/config.json
+pushd src
+bower install
+popd
+<path/to/nw/> ./
+```
 
 License
 ----
 
-GNUGPLv2
+MIT (Yes, some say GNUGPLv3, but it's all MIT now.)

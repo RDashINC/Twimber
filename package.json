@@ -4,24 +4,24 @@
   "description": "Modern Twitter Client.",
   "version": "2.0.3",
   "license": "GNUGPLv3",
-  "author" : {
-    "name": "RainbowDashDC",
-    "email": "allardj64@gmail.com",
-    "url": "http://rainbowdashdc.github.io/"
+  "author": {
+    "name": "Jared Allard",
+    "email": "jaredallard@outlook.com",
+    "url": "https://jaredallard.me"
   },
   "dependencies": {
-    "twit": "*",
-    "utf8": "*",
-    "request": "*",
-    "form-data": "*"
+    "form-data": "^0.2.0",
+    "request": "^2.63.0",
+    "twit": "^2.1.0",
+    "utf8": "^2.1.1"
   },
   "window": {
     "min-width": "481",
     "min-height": "550"
   },
   "repository": {
-	"type": "git",
-	"url": "git://github.com/RDashINC/Twimber"
+    "type": "git",
+    "url": "git://github.com/RDashINC/Twimber"
   },
   "private": true
 }

@@ -3,8 +3,8 @@
  *
  * Provides an easy interface too twit, and etc.
  *
- * @author RainbowDashDC
- * @copyright GNUGPLv2
+ * @author Jared Allard <jaredallard@outlook.com>
+ * @copyright GNUGPLv3
  * @link http://github.com/RDashINC/Twimber/master/js/twitter.js
  * @see RDashINC - http://rdashinc.github.io/
  * @see Twit, backend - https://github.com/ttezel/twit
@@ -45,8 +45,6 @@ function twitter() {
 	this.form_data = require('form-data');
 	this.utf8 = require('utf8');
 	this.request = require('request');
-
-	delete options;
 
 	console.log("[twitter.js] Twitter API Library initalized.");
 }
@@ -352,9 +350,9 @@ twitter.prototype.createaFormattedTweet = function(tobj) {
 	t +=     this.formatBody(tobj.text);
 	t +="  </div>";
 	t +="  <span class='media-actions'>";
-	t +="    <i class='glyphicon glyphicon-star' onclick=\"tlib.favorite('"+tobj.id+"', $(this));\"></i>";
+	t +="    <i class='glyphicon glyphicon-star' onclick=\"tlib.favorite('"+tobj.id_str+"', $(this));\"></i>";
 	t +="    &nbsp;";
-	t +="    <i class='glyphicon glyphicon-retweet' onclick=\"tlib.retweet('"+tobj.id+"', $(this));\"></i>";
+	t +="    <i class='glyphicon glyphicon-retweet' onclick=\"tlib.retweet('"+tobj.id_str+"', $(this));\"></i>";
 	t +="    &nbsp;";
 	t +="    <i class='glyphicon glyphicon-share-alt'></i>";
 	t +="  </span>";
@@ -670,41 +668,10 @@ twitter.prototype.retweet = function(id, obj) {
 }
 
 /**
- * Attempts too post <file> as an image too twitter, with <status>
+ * Media.
  *
- * @return to callback, error (if present), res, and body.
+ * @todo Don't use one endpoint
  **/
-twitter.prototype.postStatusWithMedia = function(status, file, cb) {
-	/** Encode the status in UTF-8 as per the Twitter API guidelines **/
-	status = this.utf8.encode(status);
-
-	// Construct a multipart/form-data request with node-form-data
-	var form = new this.form_data();
-	form.append('status', status);
-	form.append('media[]', this.fs.createReadStream(file));
-
-	// Twitter OAuth
-	form.getLength(function(err, length){
-		if (err) {
-			return requestCallback(err);
-		}
-		var oauth = {
-			consumer_key: global.ck,
-			consumer_secret: global.cs,
-			token: global.at,
-			token_secret: global.ats
-		};
-
-		var r = this.request.post({url:"https://api.twitter.com/1.1/statuses/update_with_media.json", oauth:oauth, host: "api.twitter.com", protocol: "https:"}, requestCallback);
-		r._form = form;
-		r.setHeader('content-length', length);
-	});
-
-	/** why this? **/
-	function requestCallback(err, res, body) {
-		cb(err, res, body)
-	}
-}
 
 /** Is now changeable **/
 tlib = new twitter();
